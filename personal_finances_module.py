@@ -77,6 +77,35 @@ def sort_transactions(transactions):
   return sorted_transactions
 
 
+def only_include_month_and_year(transactions, month, year):
+
+  transactions_during_month_and_year = []
+  alternate_month = '0' + month
+  alternate_year = '20' + year
+
+  for row in transactions:
+    month_letters = []
+    year_letters = []
+    date = row[0]
+    for letter in date:
+      if letter == '/':
+        break
+      else:
+        month_letters.append(letter)
+    for letter in date[::-1]:
+      if letter == '/':
+        break
+      else:
+        year_letters.append(letter)
+    combined_month_letters = ''.join(month_letters)
+    combined_year_letters = ''.join(year_letters)
+    reversed_year_letters = combined_year_letters[::-1]
+    if (combined_month_letters == month or combined_month_letters == alternate_month) and (reversed_year_letters == year or reversed_year_letters == alternate_year):
+      transactions_during_month_and_year.append(row)
+
+  return transactions_during_month_and_year
+
+
 def categorize_purchases(purchases):
 
   automotive = []
@@ -192,4 +221,12 @@ def display_wants_needs_savings(total_purchases, total_income, total_savings):
   percentage_savings = (savings/salary)*100
   percentage_left_over = (left_over/salary)*100
 
-  print(f'\nIncome:  ${salary: .2f}\n--------------------------------\nWants:  ${wants: .2f}  ({percentage_wants: .2f}% )\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n--------------------------------\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n')
+  print(f'\nIncome:  ${salary: .2f}\n--------------------------------')
+  print(f'Salary:  ${abs(total_income[0].calculate_sum()): .2f}\nInvestments Witthheld:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
+  print(f'\nWants:  ${wants: .2f}  ({percentage_wants: .2f}% )\n--------------------------------')
+  print(f'Entertainment:  ${abs(total_purchases[1].calculate_sum()): .2f}\nMiscellaneous:  ${abs(total_purchases[5].calculate_sum()): .2f}\nPersonal:  ${abs(total_purchases[6].calculate_sum()): .2f}\nShopping:  ${abs(total_purchases[9].calculate_sum()): .2f}\nTravel:  ${abs(total_purchases[10].calculate_sum()): .2f}\nWants Reimbursement:  ${abs(total_income[1].calculate_sum()): .2f}\n')
+  print(f'\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\n--------------------------------')
+  print(f'Automotive:  ${abs(total_purchases[0].calculate_sum()): .2f}\nGas Stations:  ${abs(total_purchases[2].calculate_sum()): .2f}\nGroceries:  ${abs(total_purchases[3].calculate_sum()): .2f}\nHealth:  ${abs(total_purchases[4].calculate_sum()): .2f}\nRent and Utilities:  ${abs(total_purchases[7].calculate_sum()): .2f}\nRestaurants:  ${abs(total_purchases[8].calculate_sum()): .2f}\nNeeds Reimbursement:  ${abs(total_income[2].calculate_sum()): .2f}\nSavings Withdrawals:  ${abs(total_savings[2].calculate_sum()): .2f}\nSavings Fees:  ${abs(total_savings[3].calculate_sum()): .2f}\n')
+  print(f'\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n--------------------------------')
+  print(f'Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
+  print(f'\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n--------------------------------\n')
