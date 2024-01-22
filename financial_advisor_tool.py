@@ -58,4 +58,5 @@ savings_with_category_classes = [savings_contributions, savings_employer_contrib
 personal_finances_module.display_wants_needs_savings(purchases_with_category_classes, income_with_category_classes, savings_with_category_classes)
 
 # Next, combine the categorize functions into a single function
+# Ideally, each function would only have one parameter, that way the application is not dependent on how many accounts the user has
 # Then, work towards eliminating hard-coded values, increasing the range of the functions for general cases, and improving error handling for general cases
