@@ -144,11 +144,55 @@ def categorize_purchases(purchases):
     elif row[2] == 'Travel':
       travel.append(row)
     else:
-      raise Exception('Unrecognized transaction category.')
+      raise Exception('Unrecognized purchase category.')
 
   categorized_purchases = [automotive, entertainment, gas_stations, groceries, health, miscellaneous, personal, rent_and_utilities, restaurants, shopping, travel]
 
   return categorized_purchases
+
+
+def categorize_income(income):
+
+  salary_income = []
+  wants_reimbursement = []
+  needs_reimbursement = []
+
+  for row in income:
+    if 'APPLE CASH' in row[1] or 'PURCHASE RETURN' in row[1] or 'MOBILE DEPOSIT' in row[1]:
+      wants_reimbursement.append(row)
+    elif 'VENMO CASHOUT' in row[1] or 'ONLINE TRANSFER' in row[1] or 'ZELLE' in row[1]:
+      needs_reimbursement.append(row)
+    elif 'NATIONAL INSTRUM' in row[1] or 'TAX REF' in row[1]:
+      salary_income.append(row)
+    else:
+      raise Exception('Unrecognized income category.')
+
+  return salary_income, wants_reimbursement, needs_reimbursement
+
+
+def categorize_savings(savings):
+
+  contributions = []
+  employer_contributions = []
+  withdrawals = []
+  fees = []
+  reorganizations = []
+
+  for row in savings:
+    if 'Fee' in row[1] or 'FEE' in row[1]:
+      fees.append(row)
+    elif 'ACH WITHDRAWL' in row[1]:
+      withdrawals.append(row)
+    elif 'Employer' in row[1]:
+      employer_contributions.append(row)
+    elif row[2] == 'Reorganization':
+      reorganizations.append(row)
+    elif 'DEPOSIT' in row[1] or 'Employee' in row[1]:
+      contributions.append(row)
+    else:
+      raise Exception('Unrecognized savings category.')
+
+  return contributions, employer_contributions, withdrawals, fees, reorganizations
 
 
 class TransactionCategories:
@@ -165,47 +209,6 @@ class TransactionCategories:
 
     return sum
 
-  def count_transactions(self):
-
-    return len(self.transactions)
-
-
-def differentiate_income(income):
-
-  salary_income = []
-  wants_reimbursement = []
-  needs_reimbursement = []
-
-  for row in income:
-    if 'APPLE CASH' in row[1] or 'PURCHASE RETURN' in row[1] or 'MOBILE DEPOSIT' in row[1]:
-      wants_reimbursement.append(row)
-    elif 'VENMO CASHOUT' in row[1] or 'ONLINE TRANSFER' in row[1] or 'ZELLE' in row[1]:
-      needs_reimbursement.append(row)
-    elif 'NATIONAL INSTRUM' in row[1] or 'TAX REF' in row[1]:
-      salary_income.append(row)
-
-  return salary_income, wants_reimbursement, needs_reimbursement
-
-
-def differentiate_savings(savings):
-
-  contributions = []
-  employer_contributions = []
-  withdrawals = []
-  fees = []
-
-  for row in savings:
-    if 'Fee' in row[1]:
-      fees.append(row)
-    elif 'ACH WITHDRAWL' in row[1]:
-      withdrawals.append(row)
-    elif 'Employer' in row[1]:
-      employer_contributions.append(row)
-    else:
-      contributions.append(row)
-
-  return contributions, employer_contributions, withdrawals, fees
-
 
 def display_wants_needs_savings(total_purchases, total_income, total_savings):
 
@@ -213,7 +216,7 @@ def display_wants_needs_savings(total_purchases, total_income, total_savings):
 
   wants = abs(total_purchases[1].calculate_sum() + total_purchases[5].calculate_sum() + total_purchases[6].calculate_sum() + total_purchases[9].calculate_sum() + total_purchases[10].calculate_sum() + total_income[1].calculate_sum())
   needs = abs(total_purchases[0].calculate_sum() + total_purchases[2].calculate_sum() + total_purchases[3].calculate_sum() + total_purchases[4].calculate_sum() + total_purchases[7].calculate_sum() + total_purchases[8].calculate_sum() + total_income[2].calculate_sum() + total_savings[2].calculate_sum() + total_savings[3].calculate_sum())
-  savings = abs(total_savings[0].calculate_sum() + total_savings[1].calculate_sum())
+  savings = abs(total_savings[0].calculate_sum() + total_savings[1].calculate_sum() + total_savings[4].calculate_sum())
   left_over = abs(salary - wants - needs - savings)
 
   percentage_wants = (wants/salary)*100
@@ -228,5 +231,5 @@ def display_wants_needs_savings(total_purchases, total_income, total_savings):
   print(f'\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\n--------------------------------')
   print(f'Automotive:  ${abs(total_purchases[0].calculate_sum()): .2f}\nGas Stations:  ${abs(total_purchases[2].calculate_sum()): .2f}\nGroceries:  ${abs(total_purchases[3].calculate_sum()): .2f}\nHealth:  ${abs(total_purchases[4].calculate_sum()): .2f}\nRent and Utilities:  ${abs(total_purchases[7].calculate_sum()): .2f}\nRestaurants:  ${abs(total_purchases[8].calculate_sum()): .2f}\nNeeds Reimbursement:  ${abs(total_income[2].calculate_sum()): .2f}\nSavings Withdrawals:  ${abs(total_savings[2].calculate_sum()): .2f}\nSavings Fees:  ${abs(total_savings[3].calculate_sum()): .2f}\n')
   print(f'\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n--------------------------------')
-  print(f'Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
+  print(f'Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\nReorganizations:  ${abs(total_savings[4].calculate_sum()): .2f}\n')
   print(f'\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n--------------------------------\n')
