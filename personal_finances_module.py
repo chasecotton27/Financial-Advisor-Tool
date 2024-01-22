@@ -224,12 +224,12 @@ def display_wants_needs_savings(total_purchases, total_income, total_savings):
   percentage_savings = (savings/salary)*100
   percentage_left_over = (left_over/salary)*100
 
-  print(f'\nIncome:  ${salary: .2f}\n--------------------------------')
-  print(f'Salary:  ${abs(total_income[0].calculate_sum()): .2f}\nInvestments Witthheld:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
-  print(f'\nWants:  ${wants: .2f}  ({percentage_wants: .2f}% )\n--------------------------------')
+  print(f'\nIncome:  ${salary: .2f}\n------------------------------------')
+  print(f'Salary:  ${abs(total_income[0].calculate_sum()): .2f}\nInvestment Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
+  print(f'\nWants:  ${wants: .2f}  ({percentage_wants: .2f}% )\n------------------------------------')
   print(f'Entertainment:  ${abs(total_purchases[1].calculate_sum()): .2f}\nMiscellaneous:  ${abs(total_purchases[5].calculate_sum()): .2f}\nPersonal:  ${abs(total_purchases[6].calculate_sum()): .2f}\nShopping:  ${abs(total_purchases[9].calculate_sum()): .2f}\nTravel:  ${abs(total_purchases[10].calculate_sum()): .2f}\nWants Reimbursement:  ${abs(total_income[1].calculate_sum()): .2f}\n')
-  print(f'\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\n--------------------------------')
+  print(f'\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\n------------------------------------')
   print(f'Automotive:  ${abs(total_purchases[0].calculate_sum()): .2f}\nGas Stations:  ${abs(total_purchases[2].calculate_sum()): .2f}\nGroceries:  ${abs(total_purchases[3].calculate_sum()): .2f}\nHealth:  ${abs(total_purchases[4].calculate_sum()): .2f}\nRent and Utilities:  ${abs(total_purchases[7].calculate_sum()): .2f}\nRestaurants:  ${abs(total_purchases[8].calculate_sum()): .2f}\nNeeds Reimbursement:  ${abs(total_income[2].calculate_sum()): .2f}\nSavings Withdrawals:  ${abs(total_savings[2].calculate_sum()): .2f}\nSavings Fees:  ${abs(total_savings[3].calculate_sum()): .2f}\n')
-  print(f'\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n--------------------------------')
-  print(f'Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\nReorganizations:  ${abs(total_savings[4].calculate_sum()): .2f}\n')
-  print(f'\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n--------------------------------\n')
+  print(f'\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n------------------------------------')
+  print(f'Investment Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\nReorganizations:  ${abs(total_savings[4].calculate_sum()): .2f}\n')
+  print(f'\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n------------------------------------\n')
