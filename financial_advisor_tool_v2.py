@@ -1,8 +1,5 @@
 import personal_finances_module_v2
 
-month = '12'
-year = '23'
-
 checking_transactions_file = '.\csv_files\wells_fargo_checking_account_transactions.csv'
 credit_card_transactions_file = '.\csv_files\chase_credit_card_account_transactions.csv'
 brokerage_transactions_file = '.\csv_files\etrade_brokerage_account_transactions.csv'
@@ -22,9 +19,25 @@ outgoing_brokerage = personal_finances_module_v2.incoming_or_outgoing(brokerage_
 incoming_retirement = personal_finances_module_v2.incoming_or_outgoing(retirement_transactions)[0]
 outgoing_retirement = personal_finances_module_v2.incoming_or_outgoing(retirement_transactions)[1]
 
-for row in incoming_checking:
-  print(row)
+categorized_incoming_checking = personal_finances_module_v2.categorize_incoming(incoming_checking)
+categorized_incoming_credit_card = personal_finances_module_v2.categorize_incoming(incoming_credit_card)
+categorized_incoming_brokerage = personal_finances_module_v2.categorize_incoming(incoming_brokerage)
+categorized_incoming_retirement = personal_finances_module_v2.categorize_incoming(incoming_retirement)
 
+adjustments = categorized_incoming_checking[0] + categorized_incoming_credit_card[0] + categorized_incoming_brokerage[0] + categorized_incoming_retirement[0]
+contributions = categorized_incoming_checking[1] + categorized_incoming_credit_card[1] + categorized_incoming_brokerage[1] + categorized_incoming_retirement[1]
+dividends = categorized_incoming_checking[2] + categorized_incoming_credit_card[2] + categorized_incoming_brokerage[2] + categorized_incoming_retirement[2]
+employer_contributions = categorized_incoming_checking[3] + categorized_incoming_credit_card[3] + categorized_incoming_brokerage[3] + categorized_incoming_retirement[3]
+interest = categorized_incoming_checking[4] + categorized_incoming_credit_card[4] + categorized_incoming_brokerage[4] + categorized_incoming_retirement[4]
+payments = categorized_incoming_checking[5] + categorized_incoming_credit_card[5] + categorized_incoming_brokerage[5] + categorized_incoming_retirement[5]
+payroll = categorized_incoming_checking[6] + categorized_incoming_credit_card[6] + categorized_incoming_brokerage[6] + categorized_incoming_retirement[6]
+redemptions = categorized_incoming_checking[7] + categorized_incoming_credit_card[7] + categorized_incoming_brokerage[7] + categorized_incoming_retirement[7]
+reorganizations = categorized_incoming_checking[8] + categorized_incoming_credit_card[8] + categorized_incoming_brokerage[8] + categorized_incoming_retirement[8]
+returns = categorized_incoming_checking[9] + categorized_incoming_credit_card[9] + categorized_incoming_brokerage[9] + categorized_incoming_retirement[9]
+stock_sales = categorized_incoming_checking[10] + categorized_incoming_credit_card[10] + categorized_incoming_brokerage[10] + categorized_incoming_retirement[10]
+transfers = categorized_incoming_checking[11] + categorized_incoming_credit_card[11] + categorized_incoming_brokerage[11] + categorized_incoming_retirement[11]
+tax_refunds = categorized_incoming_checking[12] + categorized_incoming_credit_card[12] + categorized_incoming_brokerage[12] + categorized_incoming_retirement[12]
+miscellaneous = categorized_incoming_checking[13] + categorized_incoming_credit_card[13] + categorized_incoming_brokerage[13] + categorized_incoming_retirement[13]
 
 """transaction_lists = personal_finances_module_v2.create_and_structure_transaction_lists(credit_card_transactions, checking_account_transactions, retirement_account_transactions, investment_account_transactions)
 

@@ -88,6 +88,56 @@ def incoming_or_outgoing(transactions):
   return incoming_transactions, outgoing_transactions
 
 
+def categorize_incoming(incoming_transactions):
+
+  adjustments = []
+  contributions = []
+  dividends = []
+  employer_contributions = []
+  interest = []
+  payments = []
+  payroll = []
+  redemptions = []
+  reorganizations = []
+  returns = []
+  stock_sales = []
+  transfers = []
+  tax_refunds = []
+  miscellaneous = []
+
+  for row in incoming_transactions:
+    if row[1] == 'Adjustment':
+      adjustments.append(row)
+    elif row[2] == 'Contributions - Employee':
+      contributions.append(row)
+    elif row[1] == 'Dividend' or row[2] == 'Dividends/Capital Gains':
+      dividends.append(row)
+    elif row[2] == 'Contributions - Employer':
+      employer_contributions.append(row)
+    elif row[1] == 'Interest' or row[2] == 'Interest Earned':
+      interest.append(row)
+    elif row[1] == 'Payment':
+      payments.append(row)
+    elif 'NATIONAL INSTRUM PAYROLL' in row[3]:
+      payroll.append(row)
+    elif 'DISCOVER CASH AWARD' in row[3]:
+      redemptions.append(row)
+    elif row[1] == 'Reorganization':
+      reorganizations.append(row)
+    elif 'PURCHASE RETURN' in row[3] or row[1] == 'Return':
+      returns.append(row)
+    elif row[1] == 'Sold':
+      stock_sales.append(row)
+    elif  'APPLE CASH BANK XFER' in row[3] or 'MOBILE DEPOSIT' in row[3] or 'MSPBNA ACH TRNSFR' in row[3] or 'ONLINE TRANSFER FROM' in row[3] or 'VENMO CASHOUT' in row[3] or 'ZELLE FROM' in row[3] or row[1] == 'Transfer':
+      transfers.append(row)
+    elif 'IRS TREAS 310 TAX REF' in row[3]:
+      tax_refunds.append(row)
+    else:
+      miscellaneous.append(row)
+
+  return adjustments, contributions, dividends, employer_contributions, interest, payments, payroll, redemptions, reorganizations, returns, stock_sales, transfers, tax_refunds, miscellaneous
+
+
 def create_and_structure_transaction_lists(credit_card_file, checking_account_file, retirement_account_file, investment_account_file):
 
   credit_purchases = []
