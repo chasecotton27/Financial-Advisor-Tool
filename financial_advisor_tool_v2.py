@@ -39,6 +39,8 @@ transfers = categorized_incoming_checking[11] + categorized_incoming_credit_card
 tax_refunds = categorized_incoming_checking[12] + categorized_incoming_credit_card[12] + categorized_incoming_brokerage[12] + categorized_incoming_retirement[12]
 miscellaneous = categorized_incoming_checking[13] + categorized_incoming_credit_card[13] + categorized_incoming_brokerage[13] + categorized_incoming_retirement[13]
 
+# Need to step back and rethink the order of operations and how I can encompass different file types and numbers of files
+
 """transaction_lists = personal_finances_module_v2.create_and_structure_transaction_lists(credit_card_transactions, checking_account_transactions, retirement_account_transactions, investment_account_transactions)
 
 credit_purchases = transaction_lists[0]
