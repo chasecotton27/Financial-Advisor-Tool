@@ -2,13 +2,90 @@ import csv
 from datetime import datetime
 
 
-"""def create_transactions_list(transactions_file):
+def create_transactions(transactions_file):
 
-  transactions_list = []
+  transactions = []
+
   with open(transactions_file, mode = 'r') as csv_file:
     csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if float(row[5]) < 0:"""
+
+    if 'wells' in transactions_file or 'fargo' in transactions_file:
+      organization = 'Wells Fargo'
+    elif 'chase' in transactions_file:
+      organization = 'Chase Bank'
+    elif 'etrade' in transactions_file:
+      organization = 'E-Trade'
+    elif 'charles' in transactions_file or 'schwab' in transactions_file:
+      organization = 'Charles Schwab'
+    else:
+      raise Exception('Unrecognized transactions file format.')
+
+    if organization == 'Wells Fargo':
+      for row in csv_reader:
+        if len(row) == 0:
+          pass
+        else:
+          row[1], row[4] = row[4], row[1]
+          row[1], row[3] = row[3], row[1]
+          row[1], row[2] = row[2], row[1]
+          transactions.append(row)
+    elif organization == 'Chase Bank':
+      i = 0
+      for row in csv_reader:
+        if i == 0 or len(row) == 0:
+          pass
+        else:
+          del row[1]
+          del row[5]
+          row[1], row[3] = row[3], row[1]
+          transactions.append(row)
+        i += 1
+    elif organization == 'E-Trade':
+      i = 0
+      for row in csv_reader:
+        if i == 0 or i == 1 or i == 2 or i == 3 or i == 4 or len(row) == 0:
+          pass
+        else:
+          del row[3]
+          del row[3]
+          del row[4]
+          del row[4]
+          row[3], row[4] = row[4], row[3]
+          transactions.append(row)
+        i += 1
+    elif organization == 'Charles Schwab':
+      i = 0
+      for row in csv_reader:
+        if i == 0 or len(row) == 0:
+          pass
+        else:
+          del row[2]
+          del row[4]
+          del row[4]
+          del row[5]
+          row[1], row[3] = row[3], row[1]
+          transactions.append(row)
+        i += 1
+
+  return transactions
+
+
+def incoming_or_outgoing(transactions):
+
+  incoming_transactions = []
+  outgoing_transactions = []
+
+  for row in transactions:
+    if float(row[4]) > 0:
+      incoming_transactions.append(row)
+    elif float(row[4]) < 0:
+      outgoing_transactions.append(row)
+    elif float(row[4]) == 0:
+      pass
+    else:
+      raise Exception('Unrecognized transaction amount.')
+
+  return incoming_transactions, outgoing_transactions
 
 
 def create_and_structure_transaction_lists(credit_card_file, checking_account_file, retirement_account_file, investment_account_file):

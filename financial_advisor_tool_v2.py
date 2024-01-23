@@ -2,12 +2,31 @@ import personal_finances_module_v2
 
 month = '12'
 year = '23'
-credit_card_transactions = 'credit_card_transactions.csv'
-checking_account_transactions = 'checking_account_transactions.csv'
-retirement_account_transactions = 'retirement_account_transactions.csv'
-investment_account_transactions = 'investment_account_transactions.csv'
 
-transaction_lists = personal_finances_module_v2.create_and_structure_transaction_lists(credit_card_transactions, checking_account_transactions, retirement_account_transactions, investment_account_transactions)
+checking_transactions_file = '.\csv_files\wells_fargo_checking_account_transactions.csv'
+credit_card_transactions_file = '.\csv_files\chase_credit_card_account_transactions.csv'
+brokerage_transactions_file = '.\csv_files\etrade_brokerage_account_transactions.csv'
+retirement_transactions_file = '.\csv_files\charles_schwab_retirement_account_transactions.csv'
+
+checking_transactions = personal_finances_module_v2.create_transactions(checking_transactions_file)
+credit_card_transactions = personal_finances_module_v2.create_transactions(credit_card_transactions_file)
+brokerage_transactions = personal_finances_module_v2.create_transactions(brokerage_transactions_file)
+retirement_transactions = personal_finances_module_v2.create_transactions(retirement_transactions_file)
+
+incoming_checking = personal_finances_module_v2.incoming_or_outgoing(checking_transactions)[0]
+outgoing_checking = personal_finances_module_v2.incoming_or_outgoing(checking_transactions)[1]
+incoming_credit_card = personal_finances_module_v2.incoming_or_outgoing(credit_card_transactions)[0]
+outgoing_credit_card = personal_finances_module_v2.incoming_or_outgoing(credit_card_transactions)[1]
+incoming_brokerage = personal_finances_module_v2.incoming_or_outgoing(brokerage_transactions)[0]
+outgoing_brokerage = personal_finances_module_v2.incoming_or_outgoing(brokerage_transactions)[1]
+incoming_retirement = personal_finances_module_v2.incoming_or_outgoing(retirement_transactions)[0]
+outgoing_retirement = personal_finances_module_v2.incoming_or_outgoing(retirement_transactions)[1]
+
+for row in incoming_checking:
+  print(row)
+
+
+"""transaction_lists = personal_finances_module_v2.create_and_structure_transaction_lists(credit_card_transactions, checking_account_transactions, retirement_account_transactions, investment_account_transactions)
 
 credit_purchases = transaction_lists[0]
 debit_purchases = transaction_lists[1]
@@ -59,4 +78,4 @@ personal_finances_module_v2.display_wants_needs_savings(purchases_with_category_
 
 # Next, combine the categorize functions into a single function
 # Ideally, each function would only have one parameter, that way the application is not dependent on how many accounts the user has
-# Then, work towards eliminating hard-coded values, increasing the range of the functions for general cases, and improving error handling for general cases
+# Then, work towards eliminating hard-coded values, increasing the range of the functions for general cases, and improving error handling for general cases"""
