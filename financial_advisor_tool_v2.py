@@ -1,6 +1,32 @@
 import personal_finances_module_v2
 
-checking_transactions_file = '.\csv_files\wells_fargo_checking_account_transactions.csv'
+
+uploading_files = True
+total_transactions = []
+
+while uploading_files:
+  transactions = personal_finances_module_v2.upload_file()
+  total_transactions.append(transactions)
+  still_uploading = input('Would you like to upload another CSV file? (Yes or No): ')
+
+  if still_uploading == 'Yes':
+    pass
+  elif still_uploading == 'No':
+    uploading_files = False
+  else:
+    print('Invalid input. Please enter Yes or No.')
+    break
+
+print(total_transactions)
+
+
+# Need to figure out how to handle cases where user types None for column numbers
+
+
+# Start of Version 2
+
+
+"""checking_transactions_file = '.\csv_files\wells_fargo_checking_account_transactions.csv'
 credit_card_transactions_file = '.\csv_files\chase_credit_card_account_transactions.csv'
 brokerage_transactions_file = '.\csv_files\etrade_brokerage_account_transactions.csv'
 retirement_transactions_file = '.\csv_files\charles_schwab_retirement_account_transactions.csv'
@@ -37,9 +63,11 @@ returns = categorized_incoming_checking[9] + categorized_incoming_credit_card[9]
 stock_sales = categorized_incoming_checking[10] + categorized_incoming_credit_card[10] + categorized_incoming_brokerage[10] + categorized_incoming_retirement[10]
 transfers = categorized_incoming_checking[11] + categorized_incoming_credit_card[11] + categorized_incoming_brokerage[11] + categorized_incoming_retirement[11]
 tax_refunds = categorized_incoming_checking[12] + categorized_incoming_credit_card[12] + categorized_incoming_brokerage[12] + categorized_incoming_retirement[12]
-miscellaneous = categorized_incoming_checking[13] + categorized_incoming_credit_card[13] + categorized_incoming_brokerage[13] + categorized_incoming_retirement[13]
+miscellaneous = categorized_incoming_checking[13] + categorized_incoming_credit_card[13] + categorized_incoming_brokerage[13] + categorized_incoming_retirement[13]"""
 
-# Need to step back and rethink the order of operations and how I can encompass different file types and numbers of files
+
+# Version 1
+
 
 """transaction_lists = personal_finances_module_v2.create_and_structure_transaction_lists(credit_card_transactions, checking_account_transactions, retirement_account_transactions, investment_account_transactions)
 
@@ -89,8 +117,4 @@ purchases_with_category_classes = [purchases_automotive, purchases_entertainment
 income_with_category_classes = [income_salary, income_wants_reimbursement, income_needs_reimbursement]
 savings_with_category_classes = [savings_contributions, savings_employer_contributions, savings_withdrawals, savings_fees, savings_reorganizations]
 
-personal_finances_module_v2.display_wants_needs_savings(purchases_with_category_classes, income_with_category_classes, savings_with_category_classes)
-
-# Next, combine the categorize functions into a single function
-# Ideally, each function would only have one parameter, that way the application is not dependent on how many accounts the user has
-# Then, work towards eliminating hard-coded values, increasing the range of the functions for general cases, and improving error handling for general cases"""
+personal_finances_module_v2.display_wants_needs_savings(purchases_with_category_classes, income_with_category_classes, savings_with_category_classes)"""
