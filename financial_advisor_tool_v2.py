@@ -1,15 +1,17 @@
 import personal_finances_module_v2
 
 
-transactions_per_account = []
+transactions_by_account = []
 uploading_files = True
+
 
 # Consider having inputs that ask about checking accounts and credit card accounts separately
 # That way the accounts can be referenced separately and credit card payments can be identified and canceled
 
+
 while uploading_files:
   transactions = personal_finances_module_v2.upload_file()
-  transactions_per_account.append(transactions)
+  transactions_by_account.append(transactions)
 
   valid_input = True
 
@@ -26,15 +28,32 @@ while uploading_files:
 
 transactions_by_account_and_type = []
 
-for accounts in transactions_per_account:
+for accounts in transactions_by_account:
   incoming_transactions = personal_finances_module_v2.incoming_or_outgoing(accounts)[0]
   outgoing_transactions = personal_finances_module_v2.incoming_or_outgoing(accounts)[1]
   transactions_by_account_and_type.append(incoming_transactions)
   transactions_by_account_and_type.append(outgoing_transactions)
 
-for accounts_and_types in transactions_by_account_and_type:
-  for transactions in accounts_and_types:
-    print(transactions.transaction_amount)
+
+# Need to offset credit card payments and other transactions before sorting
+
+
+monthly_transactions_dictionary = personal_finances_module_v2.separate_by_month(transactions_by_account_and_type)
+monthly_sorted_transactions_dictionary = personal_finances_module_v2.sort_by_date(monthly_transactions_dictionary)
+
+for month, transactions in monthly_sorted_transactions_dictionary.items():
+  if month == 11:
+    for transaction in transactions:
+      print(f'Date: {transaction.transaction_date}\nCategory: {transaction.transaction_category}\nDescription: {transaction.transaction_description}\nAmount: {transaction.transaction_amount}\n')
+
+
+# For categorizing purposes:
+# Positive checking account transactions include payrolls, venmo cashouts, zelle payments, investment account transfers,
+# apple cash transfers, discover cash transfers, mobile deposits, online deposits, purchase returns, and tax refunds (description)
+# Negative checking account transactions include purchases, chase payments, discover payments, recurring payments, venmo payments, zelle payments,
+# toyota payments, electricity payments, gas payments, clickpay payments, investment account transfers, money transfers, atm withdrawals, and atm fees (description)
+# Positive credit card transactions include payments and returns (type)
+# Negative credit card transactions include sales and fees (type)
 
 
 # Start of Version 2

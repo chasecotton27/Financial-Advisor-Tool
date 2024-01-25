@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import datetime
 
 
 class TransactionRecord:
@@ -75,6 +76,40 @@ def incoming_or_outgoing(transactions):
       outgoing_transactions.append(transaction)
 
   return incoming_transactions, outgoing_transactions
+
+
+# Review the separate_by_month and sort_by_date functions and whether they make sense at this stage (feels like I'm going backwards)
+# Might be able to combine the separate_by_month and sort_by_date functions
+# These functions also don't consider the difference between months from different years
+
+
+def separate_by_month(transactions_by_account_and_type):
+
+  monthly_transactions_dictionary = {}
+
+  for accounts_and_types in transactions_by_account_and_type:
+      sorted_transactions = sorted(accounts_and_types, key=lambda transaction: datetime.strptime(transaction.transaction_date, "%m/%d/%Y"))
+
+      for transaction in sorted_transactions:
+        month = datetime.strptime(transaction.transaction_date, "%m/%d/%Y").month
+
+        if month not in monthly_transactions_dictionary:
+          monthly_transactions_dictionary[month] = []
+
+        monthly_transactions_dictionary[month].append(transaction)
+
+  return monthly_transactions_dictionary
+
+
+def sort_by_date(monthly_transactions_dictionary):
+
+  monthly_sorted_transactions = {}
+
+  for month, transactions in monthly_transactions_dictionary.items():
+    sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction.transaction_date, "%m/%d/%Y"))
+    monthly_sorted_transactions[month] = sorted_transactions
+
+  return monthly_sorted_transactions
 
 
 # Start of Version 2
@@ -289,7 +324,7 @@ def categorize_incoming(incoming_transactions):
 
 def sort_transactions(transactions):
 
-  sorted_transactions = sorted(transactions, key=lambda x: datetime.strptime(x[0], "%m/%d/%Y"))
+  sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction[0], "%m/%d/%Y"))
 
   return sorted_transactions
 
