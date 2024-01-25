@@ -4,58 +4,77 @@ import csv
 
 class TransactionRecord:
 
-    def __init__(self, transaction, bank_name, account_type, transaction_date, transaction_type, transaction_category, transaction_description, transaction_amount):
+  def __init__(self, transaction, bank_name, account_type, transaction_date, transaction_category, transaction_description, transaction_amount):
 
-        self.transactions = transaction
-        self.bank_name = bank_name
-        self.account_type = account_type
-        self.transaction_date = transaction_date
-        self.transaction_type = transaction_type
-        self.transaction_category = transaction_category
-        self.transaction_description = transaction_description
-        self.transaction_amount = transaction_amount
+    self.transaction = transaction
+    self.bank_name = bank_name
+    self.account_type = account_type
+    self.transaction_date = transaction_date
+    self.transaction_category = transaction_category
+    self.transaction_description = transaction_description
+    self.transaction_amount = float(transaction_amount)
 
 
 def upload_file():
 
+  valid_input = True
+
+  while valid_input:
     file_name = input("Please move your CSV file into the dedicated folder called 'csv_files', then type the name of the file (including the .csv): ")
     file_path = os.path.join('.', 'csv_files', file_name)
+    if os.path.exists(file_path):
+      break
+    elif not os.path.exists(file_path):
+      print("File not found. Please check the file path.")
 
-    if not os.path.exists(file_path):
-        print("File not found. Please check the file path.")
-        return
+  bank_name = input("Which financial institution is associated with this file?: ")
+  account_type = input("What kind of account is associated with this file?: ")
 
-    bank_name = input("Which financial institution is associated with this file? (Charles Schwab, Chase Bank, E-Trade, or Wells Fargo): ")
-    account_type = input("What kind of account is associated with this file? (Checking Account, Credit Card Account, Investment Account, or Retirement Account): ")
-
+  while valid_input:
     try:
-        starting_row_index = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and not including headers): ")) - 1
-        date_index = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left, and if there is no date, then type None): ")) - 1
-        type_index = int(input("In this CSV file, which column contains the type of the transaction? (Starting with 1 on the left, and if there is no type, then type None): ")) - 1
-        category_index = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type None): ")) - 1
-        description_index = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left, and if there is no description, then type None): ")) - 1
-        amount_index = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left, and if there is no amount, then type None): ")) - 1
+      starting_row_index = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and not including headers): ")) - 1
+      date_index = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left): ")) - 1
+      category_index = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type 0): ")) - 1
+      description_index = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left): ")) - 1
+      amount_index = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left): ")) - 1
+      break
     except ValueError:
-        print("Invalid input. Please enter a valid integer.")
-        return
+      print("Invalid input. Please enter a valid integer.")
 
-    transactions = []
+  transactions = []
 
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        i = 0
-        for row in csv_reader:
-            if i < starting_row_index or not row:
-                pass
-            elif len(row) <= max(date_index, type_index, category_index, description_index, amount_index):
-                print("Error: Some specified indices are out of bounds for a row. Please check your input.")
-                break
-            else:
-                transaction = TransactionRecord(row, bank_name, account_type, row[date_index], row[type_index], row[category_index], row[description_index], row[amount_index])
-                transactions.append(transaction)
-            i += 1
+  with open(file_path, mode='r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+    i = 0
+    for row in csv_reader:
+      if i < starting_row_index or not row:
+        pass
+      elif category_index < 0:
+        transaction = TransactionRecord(row, bank_name, account_type, row[date_index], 'None', row[description_index], row[amount_index])
+        transactions.append(transaction)
+      elif len(row) <= max(date_index, category_index, description_index, amount_index):
+        print("Error: Some specified indices are out of bounds for a row. Please check your input.")
+        break
+      else:
+        transaction = TransactionRecord(row, bank_name, account_type, row[date_index], row[category_index], row[description_index], row[amount_index])
+        transactions.append(transaction)
+      i += 1
 
-    return transactions
+  return transactions
+
+
+def incoming_or_outgoing(transactions):
+
+  incoming_transactions = []
+  outgoing_transactions = []
+
+  for transaction in transactions:
+    if transaction.transaction_amount > 0:
+      incoming_transactions.append(transaction)
+    elif transaction.transaction_amount < 0:
+      outgoing_transactions.append(transaction)
+
+  return incoming_transactions, outgoing_transactions
 
 
 # Start of Version 2

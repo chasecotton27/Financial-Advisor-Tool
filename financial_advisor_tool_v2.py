@@ -1,26 +1,40 @@
 import personal_finances_module_v2
 
 
+transactions_per_account = []
 uploading_files = True
-total_transactions = []
+
+# Consider having inputs that ask about checking accounts and credit card accounts separately
+# That way the accounts can be referenced separately and credit card payments can be identified and canceled
 
 while uploading_files:
   transactions = personal_finances_module_v2.upload_file()
-  total_transactions.append(transactions)
-  still_uploading = input('Would you like to upload another CSV file? (Yes or No): ')
+  transactions_per_account.append(transactions)
 
-  if still_uploading == 'Yes':
-    pass
-  elif still_uploading == 'No':
-    uploading_files = False
-  else:
-    print('Invalid input. Please enter Yes or No.')
-    break
+  valid_input = True
 
-print(total_transactions)
+  while valid_input:
+    still_uploading = input('Would you like to upload another CSV file? (Yes or No): ')
 
+    if still_uploading == 'Yes':
+      break
+    elif still_uploading == 'No':
+      uploading_files = False
+      break
+    else:
+      print('Invalid input. Please enter Yes or No.')
 
-# Need to figure out how to handle cases where user types None for column numbers
+transactions_by_account_and_type = []
+
+for accounts in transactions_per_account:
+  incoming_transactions = personal_finances_module_v2.incoming_or_outgoing(accounts)[0]
+  outgoing_transactions = personal_finances_module_v2.incoming_or_outgoing(accounts)[1]
+  transactions_by_account_and_type.append(incoming_transactions)
+  transactions_by_account_and_type.append(outgoing_transactions)
+
+for accounts_and_types in transactions_by_account_and_type:
+  for transactions in accounts_and_types:
+    print(transactions.transaction_amount)
 
 
 # Start of Version 2
