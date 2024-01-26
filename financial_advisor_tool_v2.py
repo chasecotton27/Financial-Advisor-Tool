@@ -16,15 +16,15 @@ while uploading_files:
   valid_input = True
 
   while valid_input:
-    still_uploading = input('Would you like to upload another CSV file? (Yes or No): ')
+    still_uploading = input('Would you like to upload another CSV file? (yes or no): ').lower()
 
-    if still_uploading == 'Yes':
+    if still_uploading == 'yes':
       break
-    elif still_uploading == 'No':
+    elif still_uploading == 'no':
       uploading_files = False
       break
     else:
-      print('Invalid input. Please enter Yes or No.')
+      print('Invalid input. Please enter yes or no.')
 
 transactions_by_account_and_type = []
 
@@ -34,17 +34,17 @@ for accounts in transactions_by_account:
   transactions_by_account_and_type.append(incoming_transactions)
   transactions_by_account_and_type.append(outgoing_transactions)
 
+monthly_sorted_transactions_dictionary = personal_finances_module_v2.separate_and_sort_by_month(transactions_by_account_and_type)
 
-# Need to offset credit card payments and other transactions before sorting
+
+# For testing:
 
 
-monthly_transactions_dictionary = personal_finances_module_v2.separate_by_month(transactions_by_account_and_type)
-monthly_sorted_transactions_dictionary = personal_finances_module_v2.sort_by_date(monthly_transactions_dictionary)
-
-for month, transactions in monthly_sorted_transactions_dictionary.items():
-  if month == 11:
+for month_year, transactions in monthly_sorted_transactions_dictionary.items():
+  if month_year == '11/2023':
     for transaction in transactions:
-      print(f'Date: {transaction.transaction_date}\nCategory: {transaction.transaction_category}\nDescription: {transaction.transaction_description}\nAmount: {transaction.transaction_amount}\n')
+      print(f'\nDate: {transaction.transaction_date}\nCategory: {transaction.transaction_category}\nDescription: {transaction.transaction_description}\nAmount: {transaction.transaction_amount}')
+print()
 
 
 # For categorizing purposes:

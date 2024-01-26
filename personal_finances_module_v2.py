@@ -28,16 +28,16 @@ def upload_file():
     elif not os.path.exists(file_path):
       print("File not found. Please check the file path.")
 
-  bank_name = input("Which financial institution is associated with this file?: ")
-  account_type = input("What kind of account is associated with this file?: ")
+  bank_name = input("Which financial institution is associated with this file?: ").lower()
+  account_type = input("What kind of account is associated with this file?: ").lower()
 
   while valid_input:
     try:
-      starting_row_index = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and not including headers): ")) - 1
-      date_index = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left): ")) - 1
-      category_index = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type 0): ")) - 1
-      description_index = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left): ")) - 1
-      amount_index = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left): ")) - 1
+      starting_row = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and not including headers): "))
+      date_column = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left): "))
+      category_column = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type 0): "))
+      description_column = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left): "))
+      amount_column = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left): "))
       break
     except ValueError:
       print("Invalid input. Please enter a valid integer.")
@@ -46,20 +46,24 @@ def upload_file():
 
   with open(file_path, mode='r') as csv_file:
     csv_reader = csv.reader(csv_file)
-    i = 0
+    row_number = 1
     for row in csv_reader:
-      if i < starting_row_index or not row:
+      transaction_date = row[date_column - 1]
+      transaction_category = row[category_column - 1].lower()
+      transaction_description = row[description_column - 1].lower()
+      transaction_amount = row[amount_column - 1]
+      if row_number < starting_row or not row:
         pass
-      elif category_index < 0:
-        transaction = TransactionRecord(row, bank_name, account_type, row[date_index], 'None', row[description_index], row[amount_index])
-        transactions.append(transaction)
-      elif len(row) <= max(date_index, category_index, description_index, amount_index):
+      elif len(row) <= max(date_column, category_column, description_column, amount_column):
         print("Error: Some specified indices are out of bounds for a row. Please check your input.")
         break
-      else:
-        transaction = TransactionRecord(row, bank_name, account_type, row[date_index], row[category_index], row[description_index], row[amount_index])
+      elif category_column == 0:
+        transaction = TransactionRecord(row, bank_name, account_type, transaction_date, 'None', transaction_description, transaction_amount)
         transactions.append(transaction)
-      i += 1
+      else:
+        transaction = TransactionRecord(row, bank_name, account_type, transaction_date, transaction_category, transaction_description, transaction_amount)
+        transactions.append(transaction)
+      row_number += 1
 
   return transactions
 
@@ -78,36 +82,29 @@ def incoming_or_outgoing(transactions):
   return incoming_transactions, outgoing_transactions
 
 
-# Review the separate_by_month and sort_by_date functions and whether they make sense at this stage (feels like I'm going backwards)
-# Might be able to combine the separate_by_month and sort_by_date functions
-# These functions also don't consider the difference between months from different years
+# Need to offset credit card payments and other transactions before separating and sorting by month
 
 
-def separate_by_month(transactions_by_account_and_type):
+def separate_and_sort_by_month(transactions_by_account_and_type):
 
   monthly_transactions_dictionary = {}
 
   for accounts_and_types in transactions_by_account_and_type:
-      sorted_transactions = sorted(accounts_and_types, key=lambda transaction: datetime.strptime(transaction.transaction_date, "%m/%d/%Y"))
+    for transaction in accounts_and_types:
+      month = datetime.strptime(transaction.transaction_date, '%m/%d/%Y').month
+      year = datetime.strptime(transaction.transaction_date, '%m/%d/%Y').year
+      month_year = str(month) + '/' + str(year)
 
-      for transaction in sorted_transactions:
-        month = datetime.strptime(transaction.transaction_date, "%m/%d/%Y").month
+      if month_year not in monthly_transactions_dictionary:
+        monthly_transactions_dictionary[month_year] = []
 
-        if month not in monthly_transactions_dictionary:
-          monthly_transactions_dictionary[month] = []
-
-        monthly_transactions_dictionary[month].append(transaction)
-
-  return monthly_transactions_dictionary
-
-
-def sort_by_date(monthly_transactions_dictionary):
+      monthly_transactions_dictionary[month_year].append(transaction)
 
   monthly_sorted_transactions = {}
 
-  for month, transactions in monthly_transactions_dictionary.items():
-    sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction.transaction_date, "%m/%d/%Y"))
-    monthly_sorted_transactions[month] = sorted_transactions
+  for month_year, transactions in monthly_transactions_dictionary.items():
+    sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction.transaction_date, '%m/%d/%Y'))
+    monthly_sorted_transactions[month_year] = sorted_transactions
 
   return monthly_sorted_transactions
 
