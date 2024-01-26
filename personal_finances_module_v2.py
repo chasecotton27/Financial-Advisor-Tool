@@ -3,67 +3,133 @@ import csv
 from datetime import datetime
 
 
-class TransactionRecord:
+class Transaction:
 
-  def __init__(self, transaction, bank_name, account_type, transaction_date, transaction_category, transaction_description, transaction_amount):
+  def __init__(self, bank_name, account_type, transaction_date, transaction_description, transaction_category, transaction_type, transaction_amount):
 
-    self.transaction = transaction
     self.bank_name = bank_name
     self.account_type = account_type
     self.transaction_date = transaction_date
-    self.transaction_category = transaction_category
     self.transaction_description = transaction_description
+    self.transaction_category = transaction_category
+    self.transaction_type = transaction_type
     self.transaction_amount = float(transaction_amount)
 
 
 def upload_file():
 
-  valid_input = True
+  csv_files_folder = 'csv_files'
+  valid_bank_names = ['wells fargo', 'chase bank']
+  valid_account_types = ['checking account', 'credit card']
 
-  while valid_input:
-    file_name = input("Please move your CSV file into the dedicated folder called 'csv_files', then type the name of the file (including the .csv): ")
-    file_path = os.path.join('.', 'csv_files', file_name)
+  while True:
+    file_name = input(f'Please move your CSV file into the dedicated folder called {csv_files_folder}, then type the name of the file (including the .csv): ')
+    file_path = os.path.join('.', csv_files_folder, file_name)
     if os.path.exists(file_path):
       break
-    elif not os.path.exists(file_path):
-      print("File not found. Please check the file path.")
-
-  bank_name = input("Which financial institution is associated with this file?: ").lower()
-  account_type = input("What kind of account is associated with this file?: ").lower()
-
-  while valid_input:
-    try:
-      starting_row = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and not including headers): "))
-      date_column = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left): "))
-      category_column = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type 0): "))
-      description_column = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left): "))
-      amount_column = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left): "))
+    else:
+      print('Invalid input. Please enter a valid file name.')
+  while True:
+    bank_name = input('Which financial institution is associated with this file? (wells fargo or chase bank): ').lower()
+    if bank_name in valid_bank_names:
       break
-    except ValueError:
-      print("Invalid input. Please enter a valid integer.")
+    else:
+      print('Invalid input. Please enter a valid financial institution.')
+  while True:
+    account_type = input('What kind of account is associated with this file? (checking account or credit card): ').lower()
+    if account_type in valid_account_types:
+      break
+    else:
+      print('Invalid input. Please enter a valid account.')
 
-  transactions = []
+  while True:
+    with open(file_path, mode = 'r') as csv_file:
+      csv_reader = csv.reader(csv_file)
 
-  with open(file_path, mode='r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    row_number = 1
-    for row in csv_reader:
-      transaction_date = row[date_column - 1]
-      transaction_category = row[category_column - 1].lower()
-      transaction_description = row[description_column - 1].lower()
-      transaction_amount = row[amount_column - 1]
-      if row_number < starting_row or not row:
-        pass
-      elif len(row) <= max(date_column, category_column, description_column, amount_column):
-        print("Error: Some specified indices are out of bounds for a row. Please check your input.")
-        break
-      elif category_column == 0:
-        transaction = TransactionRecord(row, bank_name, account_type, transaction_date, 'None', transaction_description, transaction_amount)
-        transactions.append(transaction)
-      else:
-        transaction = TransactionRecord(row, bank_name, account_type, transaction_date, transaction_category, transaction_description, transaction_amount)
-        transactions.append(transaction)
-      row_number += 1
+      while True:
+        try:
+          starting_row = int(input("In this CSV file, in which row does the transaction data begin? (Starting with 1 at the top, and do not include headers): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+      while True:
+        try:
+          date_column = int(input("In this CSV file, which column contains the date of the transaction? (Starting with 1 on the left): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+      while True:
+        try:
+          description_column = int(input("In this CSV file, which column contains the description of the transaction? (Starting with 1 on the left): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+      while True:
+        try:
+          category_column = int(input("In this CSV file, which column contains the category of the transaction? (Starting with 1 on the left, and if there is no category, then type 0): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+      while True:
+        try:
+          type_column = int(input("In this CSV file, which column contains the type of the transaction? (Starting with 1 on the left, and if there is no type, then type 0): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+      while True:
+        try:
+          amount_column = int(input("In this CSV file, which column contains the amount of the transaction? (Starting with 1 on the left): "))
+          break
+        except:
+          print("Invalid input. Please enter a valid integer.")
+
+      transactions = []
+      row_number = 1
+
+      for row in csv_reader:
+        if row[date_column - 1]:
+          transaction_date = row[date_column - 1]
+        else:
+          transaction_date = 'none'
+        if row[description_column - 1]:
+          transaction_description = row[description_column - 1].lower()
+        else:
+          transaction_description = 'none'
+        if row[category_column - 1]:
+          transaction_category = row[category_column - 1].lower()
+        else:
+          transaction_category = 'none'
+        if row[type_column - 1]:
+          transaction_type = row[type_column - 1].lower()
+        else:
+          transaction_type = 'none'
+        if row[amount_column - 1]:
+          transaction_amount = row[amount_column - 1]
+        else:
+          transaction_amount = 'none'
+
+        if row_number < starting_row or not row:
+          pass
+        elif len(row) < max(date_column, description_column, category_column, type_column, amount_column):
+          print("Error: Some specified column numbers are out of bounds for a row. Please check your input.")
+          break
+        elif category_column == 0 and type_column != 0:
+          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, 'none', transaction_type, transaction_amount)
+          transactions.append(transaction)
+        elif category_column != 0 and type_column == 0:
+          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, transaction_category, 'none', transaction_amount)
+          transactions.append(transaction)
+        elif category_column == 0 and type_column == 0:
+          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, 'none', 'none', transaction_amount)
+          transactions.append(transaction)
+        else:
+          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, transaction_category, transaction_type, transaction_amount)
+          transactions.append(transaction)
+
+        row_number += 1
+
+    if transactions:
+      break
 
   return transactions
 
@@ -72,20 +138,47 @@ def incoming_or_outgoing(transactions):
 
   incoming_transactions = []
   outgoing_transactions = []
+  null_transactions = []
 
   for transaction in transactions:
     if transaction.transaction_amount > 0:
       incoming_transactions.append(transaction)
     elif transaction.transaction_amount < 0:
       outgoing_transactions.append(transaction)
+    else:
+      null_transactions.append(transaction)
 
-  return incoming_transactions, outgoing_transactions
+  return incoming_transactions, outgoing_transactions, null_transactions
 
 
-# Need to offset credit card payments and other transactions before separating and sorting by month
+def identify_credit_payments(transactions):
+
+  credit_payments = []
+
+  for transaction in transactions:
+    if transaction.transaction_type == 'payment':
+      credit_payments.append(transaction)
+
+  return credit_payments
 
 
-def separate_and_sort_by_month(transactions_by_account_and_type):
+def identify_credit_returns(transactions):
+
+  credit_returns = []
+
+  for transaction in transactions:
+    if transaction.transaction_type == 'return':
+      credit_returns.append(transaction)
+
+  return credit_returns
+
+
+# Need to find a way to identify descriptions, categories, and types that applies to any bank_name and account_type
+# Also need to find a way to add unrecognized transactions to identify_credit_payments() and identify_credit_returns()
+# Need to offset credit card payments and other transactions before separate_and_sort_by_month()
+
+
+"""def separate_and_sort_by_month(transactions_by_account_and_type):
 
   monthly_transactions_dictionary = {}
 
@@ -106,256 +199,10 @@ def separate_and_sort_by_month(transactions_by_account_and_type):
     sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction.transaction_date, '%m/%d/%Y'))
     monthly_sorted_transactions[month_year] = sorted_transactions
 
-  return monthly_sorted_transactions
+  return monthly_sorted_transactions"""
 
 
-# Start of Version 2
-
-
-"""def create_transactions(transactions_file):
-
-  transactions = []
-
-  with open(transactions_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    if 'wells' in transactions_file or 'fargo' in transactions_file:
-      organization = 'Wells Fargo'
-    elif 'chase' in transactions_file:
-      organization = 'Chase Bank'
-    elif 'etrade' in transactions_file:
-      organization = 'E-Trade'
-    elif 'charles' in transactions_file or 'schwab' in transactions_file:
-      organization = 'Charles Schwab'
-    else:
-      raise Exception('Unrecognized transactions file format.')
-
-    if organization == 'Wells Fargo':
-      for row in csv_reader:
-        if len(row) == 0:
-          pass
-        else:
-          row[1], row[4] = row[4], row[1]
-          row[1], row[3] = row[3], row[1]
-          row[1], row[2] = row[2], row[1]
-          transactions.append(row)
-    elif organization == 'Chase Bank':
-      i = 0
-      for row in csv_reader:
-        if i == 0 or len(row) == 0:
-          pass
-        else:
-          del row[1]
-          del row[5]
-          row[1], row[3] = row[3], row[1]
-          transactions.append(row)
-        i += 1
-    elif organization == 'E-Trade':
-      i = 0
-      for row in csv_reader:
-        if i == 0 or i == 1 or i == 2 or i == 3 or i == 4 or len(row) == 0:
-          pass
-        else:
-          del row[3]
-          del row[3]
-          del row[4]
-          del row[4]
-          row[3], row[4] = row[4], row[3]
-          transactions.append(row)
-        i += 1
-    elif organization == 'Charles Schwab':
-      i = 0
-      for row in csv_reader:
-        if i == 0 or len(row) == 0:
-          pass
-        else:
-          del row[2]
-          del row[4]
-          del row[4]
-          del row[5]
-          row[1], row[3] = row[3], row[1]
-          transactions.append(row)
-        i += 1
-
-  return transactions
-
-
-def incoming_or_outgoing(transactions):
-
-  incoming_transactions = []
-  outgoing_transactions = []
-
-  for row in transactions:
-    if float(row[4]) > 0:
-      incoming_transactions.append(row)
-    elif float(row[4]) < 0:
-      outgoing_transactions.append(row)
-    elif float(row[4]) == 0:
-      pass
-    else:
-      raise Exception('Unrecognized transaction amount.')
-
-  return incoming_transactions, outgoing_transactions
-
-
-def categorize_incoming(incoming_transactions):
-
-  adjustments = []
-  contributions = []
-  dividends = []
-  employer_contributions = []
-  interest = []
-  payments = []
-  payroll = []
-  redemptions = []
-  reorganizations = []
-  returns = []
-  stock_sales = []
-  transfers = []
-  tax_refunds = []
-  miscellaneous = []
-
-  for row in incoming_transactions:
-    if row[1] == 'Adjustment':
-      adjustments.append(row)
-    elif row[2] == 'Contributions - Employee':
-      contributions.append(row)
-    elif row[1] == 'Dividend' or row[2] == 'Dividends/Capital Gains':
-      dividends.append(row)
-    elif row[2] == 'Contributions - Employer':
-      employer_contributions.append(row)
-    elif row[1] == 'Interest' or row[2] == 'Interest Earned':
-      interest.append(row)
-    elif row[1] == 'Payment':
-      payments.append(row)
-    elif 'NATIONAL INSTRUM PAYROLL' in row[3]:
-      payroll.append(row)
-    elif 'DISCOVER CASH AWARD' in row[3]:
-      redemptions.append(row)
-    elif row[1] == 'Reorganization':
-      reorganizations.append(row)
-    elif 'PURCHASE RETURN' in row[3] or row[1] == 'Return':
-      returns.append(row)
-    elif row[1] == 'Sold':
-      stock_sales.append(row)
-    elif  'APPLE CASH BANK XFER' in row[3] or 'MOBILE DEPOSIT' in row[3] or 'MSPBNA ACH TRNSFR' in row[3] or 'ONLINE TRANSFER FROM' in row[3] or 'VENMO CASHOUT' in row[3] or 'ZELLE FROM' in row[3] or row[1] == 'Transfer':
-      transfers.append(row)
-    elif 'IRS TREAS 310 TAX REF' in row[3]:
-      tax_refunds.append(row)
-    else:
-      miscellaneous.append(row)
-
-  return adjustments, contributions, dividends, employer_contributions, interest, payments, payroll, redemptions, reorganizations, returns, stock_sales, transfers, tax_refunds, miscellaneous"""
-
-
-# Version 1
-
-
-"""def create_and_structure_transaction_lists(credit_card_file, checking_account_file, retirement_account_file, investment_account_file):
-
-  credit_purchases = []
-  with open(credit_card_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if float(row[5]) < 0:
-        credit_purchases.append(row)
-
-  debit_purchases = []
-  with open(checking_account_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if float(row[1]) < 0 and 'CHASE CREDIT CRD' not in row[4] and 'DISCOVER E-PAYMENT' not in row[4] and 'MSPBNA ACH' not in row[4]:
-        debit_purchases.append(row)
-
-  income = []
-  with open(checking_account_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if float(row[1]) > 0 and 'MSPBNA ACH' not in row[4] and 'DISCOVER CASH' not in row[4]:
-        income.append(row)
-
-  retirement = []
-  with open(retirement_account_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if row[4] != 'Purchase' and row[4] != 'Cash Disbursement' and row[3] != 'Dividends/Capital Gains' and row[3] != 'Interest Earned' and row[3] != 'Transfers In/Out':
-        retirement.append(row)
-
-  investments = []
-  with open(investment_account_file, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-      if 'Misc Trade' in row[1] or 'Reorganization' in row[1] or 'Transfer' in row[1]:
-        investments.append(row)
-
-  for row in credit_purchases:
-    del row[1]
-    del row[3]
-
-  for row in debit_purchases:
-    del row[2]
-    row[1], row[3] = row[3], row[1]
-
-  for row in income:
-    del row[2]
-    row[1], row[3] = row[3], row[1]
-
-  for row in retirement:
-    row[0] = row[0][:-5]
-    del row[1]
-    del row[1]
-    del row[3]
-    del row[3]
-
-  for row in investments:
-    del row[2]
-    del row[2]
-    del row[2]
-    del row[3]
-    del row[3]
-    row[1], row[3] = row[3], row[1]
-    row[2], row[3] = row[3], row[2]
-
-  return credit_purchases, debit_purchases, income, retirement, investments
-
-
-def sort_transactions(transactions):
-
-  sorted_transactions = sorted(transactions, key=lambda transaction: datetime.strptime(transaction[0], "%m/%d/%Y"))
-
-  return sorted_transactions
-
-
-def only_include_month_and_year(transactions, month, year):
-
-  transactions_during_month_and_year = []
-  alternate_month = '0' + month
-  alternate_year = '20' + year
-
-  for row in transactions:
-    month_letters = []
-    year_letters = []
-    date = row[0]
-    for letter in date:
-      if letter == '/':
-        break
-      else:
-        month_letters.append(letter)
-    for letter in date[::-1]:
-      if letter == '/':
-        break
-      else:
-        year_letters.append(letter)
-    combined_month_letters = ''.join(month_letters)
-    combined_year_letters = ''.join(year_letters)
-    reversed_year_letters = combined_year_letters[::-1]
-    if (combined_month_letters == month or combined_month_letters == alternate_month) and (reversed_year_letters == year or reversed_year_letters == alternate_year):
-      transactions_during_month_and_year.append(row)
-
-  return transactions_during_month_and_year
-
-
-def categorize_purchases(purchases):
+"""def categorize_purchases(purchases):
 
   automotive = []
   entertainment = []
@@ -441,44 +288,4 @@ def categorize_savings(savings):
     else:
       raise Exception('Unrecognized savings category.')
 
-  return contributions, employer_contributions, withdrawals, fees, reorganizations
-
-
-class TransactionCategories:
-
-  def __init__(self, transactions):
-
-    self.transactions = transactions
-
-  def calculate_sum(self):
-
-    sum = 0
-    for row in self.transactions:
-      sum += float(row[3])
-
-    return sum
-
-
-def display_wants_needs_savings(total_purchases, total_income, total_savings):
-
-  salary = abs(total_income[0].calculate_sum() + total_savings[0].calculate_sum() + total_savings[1].calculate_sum())
-
-  wants = abs(total_purchases[1].calculate_sum() + total_purchases[5].calculate_sum() + total_purchases[6].calculate_sum() + total_purchases[9].calculate_sum() + total_purchases[10].calculate_sum() + total_income[1].calculate_sum())
-  needs = abs(total_purchases[0].calculate_sum() + total_purchases[2].calculate_sum() + total_purchases[3].calculate_sum() + total_purchases[4].calculate_sum() + total_purchases[7].calculate_sum() + total_purchases[8].calculate_sum() + total_income[2].calculate_sum() + total_savings[2].calculate_sum() + total_savings[3].calculate_sum())
-  savings = abs(total_savings[0].calculate_sum() + total_savings[1].calculate_sum() + total_savings[4].calculate_sum())
-  left_over = abs(salary - wants - needs - savings)
-
-  percentage_wants = (wants/salary)*100
-  percentage_needs = (needs/salary)*100
-  percentage_savings = (savings/salary)*100
-  percentage_left_over = (left_over/salary)*100
-
-  print(f'\nIncome:  ${salary: .2f}\n------------------------------------')
-  print(f'Salary:  ${abs(total_income[0].calculate_sum()): .2f}\nInvestment Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\n')
-  print(f'\nWants:  ${wants: .2f}  ({percentage_wants: .2f}% )\n------------------------------------')
-  print(f'Entertainment:  ${abs(total_purchases[1].calculate_sum()): .2f}\nMiscellaneous:  ${abs(total_purchases[5].calculate_sum()): .2f}\nPersonal:  ${abs(total_purchases[6].calculate_sum()): .2f}\nShopping:  ${abs(total_purchases[9].calculate_sum()): .2f}\nTravel:  ${abs(total_purchases[10].calculate_sum()): .2f}\nWants Reimbursement:  ${abs(total_income[1].calculate_sum()): .2f}\n')
-  print(f'\nNeeds:  ${needs: .2f}  ({percentage_needs: .2f}% )\n------------------------------------')
-  print(f'Automotive:  ${abs(total_purchases[0].calculate_sum()): .2f}\nGas Stations:  ${abs(total_purchases[2].calculate_sum()): .2f}\nGroceries:  ${abs(total_purchases[3].calculate_sum()): .2f}\nHealth:  ${abs(total_purchases[4].calculate_sum()): .2f}\nRent and Utilities:  ${abs(total_purchases[7].calculate_sum()): .2f}\nRestaurants:  ${abs(total_purchases[8].calculate_sum()): .2f}\nNeeds Reimbursement:  ${abs(total_income[2].calculate_sum()): .2f}\nSavings Withdrawals:  ${abs(total_savings[2].calculate_sum()): .2f}\nSavings Fees:  ${abs(total_savings[3].calculate_sum()): .2f}\n')
-  print(f'\nSavings:  ${savings: .2f}  ({percentage_savings: .2f}% )\n------------------------------------')
-  print(f'Investment Contributions:  ${abs(total_savings[0].calculate_sum()): .2f}\nEmployer Contributions:  ${abs(total_savings[1].calculate_sum()): .2f}\nReorganizations:  ${abs(total_savings[4].calculate_sum()): .2f}\n')
-  print(f'\nLeft Over:  ${left_over: .2f}  ({percentage_left_over: .2f}% )\n------------------------------------\n')"""
+  return contributions, employer_contributions, withdrawals, fees, reorganizations"""
