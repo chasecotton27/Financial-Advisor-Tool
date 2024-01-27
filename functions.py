@@ -1,19 +1,9 @@
 import os
 import csv
 from datetime import datetime
-
-
-class Transaction:
-
-  def __init__(self, bank_name, account_type, transaction_date, transaction_description, transaction_category, transaction_type, transaction_amount):
-
-    self.bank_name = bank_name
-    self.account_type = account_type
-    self.transaction_date = transaction_date
-    self.transaction_description = transaction_description
-    self.transaction_category = transaction_category
-    self.transaction_type = transaction_type
-    self.transaction_amount = float(transaction_amount)
+from classes import Bank
+from classes import Account
+from classes import Transaction
 
 
 def upload_file():
@@ -30,14 +20,14 @@ def upload_file():
     else:
       print('Invalid input. Please enter a valid file name.')
   while True:
-    bank_name = input('Which financial institution is associated with this file? (wells fargo or chase bank): ').lower()
-    if bank_name in valid_bank_names:
+    bank = Bank(input('Which financial institution is associated with this file? (wells fargo or chase bank): ').lower())
+    if bank.bank_name in valid_bank_names:
       break
     else:
       print('Invalid input. Please enter a valid financial institution.')
   while True:
-    account_type = input('What kind of account is associated with this file? (checking account or credit card): ').lower()
-    if account_type in valid_account_types:
+    account = Account(bank.bank_name, input('What kind of account is associated with this file? (checking account or credit card): ').lower())
+    if account.account_type in valid_account_types:
       break
     else:
       print('Invalid input. Please enter a valid account.')
@@ -114,16 +104,16 @@ def upload_file():
           print("Error: Some specified column numbers are out of bounds for a row. Please check your input.")
           break
         elif category_column == 0 and type_column != 0:
-          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, 'none', transaction_type, transaction_amount)
+          transaction = Transaction(account.bank_name, account.account_type, transaction_date, transaction_description, 'none', transaction_type, transaction_amount)
           transactions.append(transaction)
         elif category_column != 0 and type_column == 0:
-          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, transaction_category, 'none', transaction_amount)
+          transaction = Transaction(account.bank_name, account.account_type, transaction_date, transaction_description, transaction_category, 'none', transaction_amount)
           transactions.append(transaction)
         elif category_column == 0 and type_column == 0:
-          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, 'none', 'none', transaction_amount)
+          transaction = Transaction(account.bank_name, account.account_type, transaction_date, transaction_description, 'none', 'none', transaction_amount)
           transactions.append(transaction)
         else:
-          transaction = Transaction(bank_name, account_type, transaction_date, transaction_description, transaction_category, transaction_type, transaction_amount)
+          transaction = Transaction(account.bank_name, account.account_type, transaction_date, transaction_description, transaction_category, transaction_type, transaction_amount)
           transactions.append(transaction)
 
         row_number += 1
@@ -131,7 +121,7 @@ def upload_file():
     if transactions:
       break
 
-  return transactions
+  return bank, account, transactions
 
 
 def incoming_or_outgoing(transactions):
@@ -173,11 +163,6 @@ def identify_credit_returns(transactions):
   return credit_returns
 
 
-# Need to find a way to identify descriptions, categories, and types that applies to any bank_name and account_type
-# Also need to find a way to add unrecognized transactions to identify_credit_payments() and identify_credit_returns()
-# Need to offset credit card payments and other transactions before separate_and_sort_by_month()
-
-
 """def separate_and_sort_by_month(transactions_by_account_and_type):
 
   monthly_transactions_dictionary = {}
@@ -200,92 +185,3 @@ def identify_credit_returns(transactions):
     monthly_sorted_transactions[month_year] = sorted_transactions
 
   return monthly_sorted_transactions"""
-
-
-"""def categorize_purchases(purchases):
-
-  automotive = []
-  entertainment = []
-  gas_stations = []
-  groceries = []
-  health = []
-  miscellaneous = []
-  personal = []
-  rent_and_utilities = []
-  restaurants = []
-  shopping = []
-  travel = []
-
-  for row in purchases:
-    if row[2] == 'Automotive' or 'TOYOTA ACH' in row[1]:
-      automotive.append(row)
-    elif row[2] == 'Entertainment' or 'PlayStation' in row[1] or 'PlaystationNetwork' in row[1] or 'SPOTIFY' in row[1] or 'APPLE.COM/BILL' in row[1]:
-      entertainment.append(row)
-    elif row[2] == 'Gas':
-      gas_stations.append(row)
-    elif row[2] == 'Groceries':
-      groceries.append(row)
-    elif row[2] == 'Health & Wellness' or 'GOLDS GYM' in row[1]:
-      health.append(row)
-    elif row[2] == 'Miscellaneous' or row[2] == 'Fees & Adjustments':
-      miscellaneous.append(row)
-    elif row[2] == 'Personal' or row[2] == 'Education' or row[2] == 'Gifts & Donations' or row[2] == 'Home' or row[2] == 'Professional Services' or 'ATM' in row[1] or 'VENMO' in row[1] or 'PAYPAL' in row[1] or 'NORTHWEST HILLS' in row[1]:
-      personal.append(row)
-    elif row[2] == 'Bills & Utilities' or 'ZELLE' in row[1] or 'ClickPay' in row[1] or 'City of Austin' in row[1] or 'ONE GAS TEXAS' in row[1] or 'AT''&''T' in row[1]:
-      rent_and_utilities.append(row)
-    elif row[2] == 'Food & Drink':
-      restaurants.append(row)
-    elif row[2] == 'Shopping' or 'PURCHASE AUTHORIZED' in row[1]:
-      shopping.append(row)
-    elif row[2] == 'Travel':
-      travel.append(row)
-    else:
-      raise Exception('Unrecognized purchase category.')
-
-  categorized_purchases = [automotive, entertainment, gas_stations, groceries, health, miscellaneous, personal, rent_and_utilities, restaurants, shopping, travel]
-
-  return categorized_purchases
-
-
-def categorize_income(income):
-
-  salary_income = []
-  wants_reimbursement = []
-  needs_reimbursement = []
-
-  for row in income:
-    if 'APPLE CASH' in row[1] or 'PURCHASE RETURN' in row[1] or 'MOBILE DEPOSIT' in row[1]:
-      wants_reimbursement.append(row)
-    elif 'VENMO CASHOUT' in row[1] or 'ONLINE TRANSFER' in row[1] or 'ZELLE' in row[1]:
-      needs_reimbursement.append(row)
-    elif 'NATIONAL INSTRUM' in row[1] or 'TAX REF' in row[1]:
-      salary_income.append(row)
-    else:
-      raise Exception('Unrecognized income category.')
-
-  return salary_income, wants_reimbursement, needs_reimbursement
-
-
-def categorize_savings(savings):
-
-  contributions = []
-  employer_contributions = []
-  withdrawals = []
-  fees = []
-  reorganizations = []
-
-  for row in savings:
-    if 'Fee' in row[1] or 'FEE' in row[1]:
-      fees.append(row)
-    elif 'ACH WITHDRAWL' in row[1]:
-      withdrawals.append(row)
-    elif 'Employer' in row[1]:
-      employer_contributions.append(row)
-    elif row[2] == 'Reorganization':
-      reorganizations.append(row)
-    elif 'DEPOSIT' in row[1] or 'Employee' in row[1]:
-      contributions.append(row)
-    else:
-      raise Exception('Unrecognized savings category.')
-
-  return contributions, employer_contributions, withdrawals, fees, reorganizations"""
