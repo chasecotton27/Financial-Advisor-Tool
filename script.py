@@ -1,6 +1,14 @@
 import functions
 
 
+# The goal is to adjust the transaction attributes for each transaction so that they follow a uniform structure
+# These attributes should be the main determinator of the classification/operation of a transaction
+# Then, account/transaction records can be created to analyze the transactions as a whole
+# Keep the functions very modular, where each function completes a very specific task
+# AccountRecord might need to be changed to TransactionRecord, depending on the requirements that become visible later
+# Assigning and updating transaction attributes might involve some machine learning, that way there's no dependency on keywords specific to my account
+# These attributes can be updated one step at a time, since a complete transactions list already exists
+
 uploading_checking_files = True
 checking_files_data = []
 
