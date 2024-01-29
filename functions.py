@@ -1,6 +1,7 @@
 import os
 import csv
 from classes import Transaction
+from datetime import datetime
 
 
 def upload_file():
@@ -128,6 +129,25 @@ def create_transactions(file_data):
     else:
       transaction = Transaction(account_type, transaction_date, transaction_description, transaction_amount, transaction_category, transaction_type)
       transactions.append(transaction)
+
+  return transactions
+
+
+def format_transaction_dates(transactions):
+
+  for transaction in transactions:
+    month = datetime.strptime(transaction.transaction_date, '%m/%d/%Y').month
+    day = datetime.strptime(transaction.transaction_date, '%m/%d/%Y').day
+    year = datetime.strptime(transaction.transaction_date, '%m/%d/%Y').year
+    date = str(month) + '/' + str(day) + '/' + str(year)
+    transaction.transaction_date = date
+
+  return transactions
+
+
+def sort_transactions(transactions):
+
+  transactions = sorted(transactions, key = lambda transaction: datetime.strptime(transaction.transaction_date, '%m/%d/%Y'))
 
   return transactions
 

@@ -86,6 +86,9 @@ for file_data in files_data:
 
 transactions = [transaction for file_transactions in files_transactions for transaction in file_transactions]
 
+transactions = functions.format_transaction_dates(transactions)
+transactions = functions.sort_transactions(transactions)
+
 # Account records will be created after the transactions list is sorted and transaction attributes are formatted for each transaction
 
 for file_transactions in files_transactions:
@@ -94,10 +97,10 @@ for file_transactions in files_transactions:
 # For testing:
 
 print()
-print('First 5 Transactions:')
+print('First 20 Transactions:')
 print()
 
-for i in range(5):
+for i in range(20):
   print(f'Account Type: {transactions[i].account_type}')
   print(f'Transaction Date: {transactions[i].transaction_date}')
   print(f'Transaction Description: {transactions[i].transaction_description}')
@@ -106,10 +109,10 @@ for i in range(5):
   print(f'Transaction Type: {transactions[i].transaction_type}')
   print()
 
-print('Last 5 Transactions:')
+print('Last 20 Transactions:')
 print()
 
-for i in range(-1, -6, -1):
+for i in range(-1, -21, -1):
   print(f'Account Type: {transactions[i].account_type}')
   print(f'Transaction Date: {transactions[i].transaction_date}')
   print(f'Transaction Description: {transactions[i].transaction_description}')
