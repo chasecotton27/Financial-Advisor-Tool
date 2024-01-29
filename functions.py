@@ -132,7 +132,7 @@ def create_transactions(file_data):
   return transactions
 
 
-# Account records will be created after the transaction attributes are formatted for each transaction
+# Account records will be created after the transactions list is sorted and transaction attributes are formatted for each transaction
 
 def create_account_records(file_transactions):
 

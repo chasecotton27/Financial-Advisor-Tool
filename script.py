@@ -78,7 +78,7 @@ for file_data in files_data:
 
 transactions = [transaction for file_transactions in files_transactions for transaction in file_transactions]
 
-# Account records will be created after the transaction attributes are formatted for each transaction
+# Account records will be created after the transactions list is sorted and transaction attributes are formatted for each transaction
 
 for file_transactions in files_transactions:
   pass
