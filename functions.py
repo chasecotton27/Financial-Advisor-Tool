@@ -1,5 +1,6 @@
 import os
 import csv
+import re
 from classes import Transaction
 from datetime import datetime
 
@@ -297,6 +298,60 @@ def format_transaction_dates(transactions):
 def sort_transactions(transactions):
 
   transactions = sorted(transactions, key = lambda transaction: datetime.strptime(transaction.transaction_date, '%m/%d/%Y'))
+
+  return transactions
+
+
+def clean_transaction_descriptions(transactions, first_name, last_name):
+
+  phone_numbers = [
+    r'\b\d{3}-\d{3}-\d{4}\b', r'\b\d{3}.\d{3}.\d{4}\b', r'\b\d{3}\s\d{3}\s\d{4}\b',
+    r'\b\(\d{3}\)-\d{3}-\d{4}\b', r'\b\(\d{3}\).\d{3}.\d{4}\b', r'\b\(\d{3}\)\s\d{3}\s\d{4}\b',
+    r'\b\(\d{3}\)\s\d{3}-\d{4}\b', r'\b\(\d{3}\)\s\d{3}.\d{4}\b'
+  ]
+
+  dates = [
+    r'\b\d{1,2}/\d{1,2}/\d{2,4}\b', r'\b\d{1,2}-\d{1,2}-\d{2,4}\b', r'\b\d{1,2}.\d{1,2}.\d{2,4}\b', r'\b\d{1,2}\s\d{1,2}\s\d{2,4}\b',
+    r'\b\d{1,2}/\d{1,2}\b', r'\b\d{1,2}-\d{1,2}\b', r'\b\d{1,2}.\d{1,2}\b', r'\b\d{1,2}\s\d{1,2}\b',
+    r'\b\d{1,2}/\d{2,4}\b', r'\b\d{1,2}-\d{2,4}\b', r'\b\d{1,2}.\d{2,4}\b', r'\b\d{1,2}\s\d{2,4}\b',
+    r'\b\d{2,4}/\d{1,2}\b', r'\b\d{2,4}-\d{1,2}\b', r'\b\d{2,4}.\d{1,2}\b', r'\b\d{2,4}\s\d{1,2}\b'
+  ]
+
+  us_states = [
+    r'\bal\b', r'\bak\b', r'\baz\b', r'\bar\b', r'\bas\b', r'\bca\b', r'\bco\b', r'\bct\b',
+    r'\bde\b', r'\bdc\b', r'\bfl\b', r'\bga\b', r'\bgu\b', r'\bhi\b', r'\bid\b', r'\bil\b',
+    r'\bin\b', r'\bia\b', r'\bks\b', r'\bky\b', r'\bla\b', r'\bme\b', r'\bmd\b', r'\bma\b',
+    r'\bmi\b', r'\bmn\b', r'\bms\b', r'\bmo\b', r'\bmt\b', r'\bne\b', r'\bnv\b', r'\bnh\b',
+    r'\bnj\b', r'\bnm\b', r'\bny\b', r'\bnc\b', r'\bnd\b', r'\bmp\b', r'\boh\b', r'\bok\b',
+    r'\bor\b', r'\bpa\b', r'\bpr\b', r'\bri\b', r'\bsc\b', r'\bsd\b', r'\btn\b', r'\btx\b',
+    r'\btt\b', r'\but\b', r'\bvt\b', r'\bva\b', r'\bvi\b', r'\bwa\b', r'\bwv\b', r'\bwi\b',
+    r'\bwy\b'
+  ]
+
+  combined_phone_numbers = '|'.join(['(' + phone_number + ')' for phone_number in phone_numbers])
+  combined_dates = '|'.join(['(' + date + ')' for date in dates])
+  combined_us_states = '|'.join(['(' + us_state + ')' for us_state in us_states])
+
+  name = r'\b{}\s{}\b'.format(re.escape(first_name), re.escape(last_name))
+  reversed_name = r'\b{}\s{}\b'.format(re.escape(last_name), re.escape(first_name))
+  singular_name = r'\b{}{}\b'.format(re.escape(first_name), re.escape(last_name))
+  singular_reversed_name = r'\b{}{}\b'.format(re.escape(last_name), re.escape(first_name))
+
+  for transaction in transactions:
+    transaction.transaction_description = re.sub(r',', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_phone_numbers, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_dates, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(name, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(reversed_name, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(singular_name, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(singular_reversed_name, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\bcard\b|\bcrd\b', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\.com|\.net|\.org|\.co|\.us|\.ai|\.io|\.gg|\.gov|\.edu|\.info|\.xyz|\.ly|\.site|\.me', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\*|#|-|:|\.|/', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\d', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\s[a-z]\s', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
 
   return transactions
 

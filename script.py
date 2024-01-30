@@ -9,6 +9,10 @@ import functions
 # Assigning and updating transaction attributes might involve some machine learning, that way there's no dependency on keywords specific to my account
 # These attributes can be updated one step at a time, since a complete transactions list already exists
 
+first_name = input('What is your first name?\n').lower()
+last_name = input('What is your last name?\n').lower()
+print(f'Hello, {first_name} {last_name}.')
+
 uploading_checking_files = True
 checking_accounts_transactions = []
 
@@ -80,11 +84,15 @@ for credit_card_account_transactions in credit_card_accounts_transactions:
 transactions = checking_transactions + credit_card_transactions
 transactions = functions.format_transaction_dates(transactions)
 transactions = functions.sort_transactions(transactions)
+transactions = functions.clean_transaction_descriptions(transactions, first_name, last_name)
 
 
 # For testing:
 
-print()
+for transaction in transactions:
+  print(transaction.transaction_description)
+
+'''print()
 
 for checking_account_transactions in checking_accounts_transactions:
   for i in range(3):
@@ -132,7 +140,7 @@ for i in range(-1, -6, -1):
   print(f'Transaction Amount: {transactions[i].transaction_amount}')
   print(f'Transaction Category: {transactions[i].transaction_category}')
   print(f'Transaction Type: {transactions[i].transaction_type}')
-  print()
+  print()'''
 
 
 # From Chase and Discover formats:
