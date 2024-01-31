@@ -3,6 +3,8 @@ import csv
 import re
 from classes import Transaction
 from datetime import datetime
+from nltk import FreqDist
+from nltk.tokenize import word_tokenize
 
 
 def upload_file(account_type):
@@ -328,29 +330,47 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     r'\bwy\b'
   ]
 
+  url_suffixes = [
+    r'\.com', r'\.net', r'\.org', r'\.co', r'\.us', r'\.ai', r'\.io', r'\.gg',
+    r'\.gov', r'\.edu', r'\.info', r'\.xyz', r'\.ly', r'\.site', r'\.me'
+  ]
+
   combined_phone_numbers = '|'.join(['(' + phone_number + ')' for phone_number in phone_numbers])
   combined_dates = '|'.join(['(' + date + ')' for date in dates])
   combined_us_states = '|'.join(['(' + us_state + ')' for us_state in us_states])
+  combined_url_suffixes = '|'.join(['(' + url_suffix + ')' for url_suffix in url_suffixes])
 
   name = r'\b{}\s{}\b'.format(re.escape(first_name), re.escape(last_name))
   reversed_name = r'\b{}\s{}\b'.format(re.escape(last_name), re.escape(first_name))
-  singular_name = r'\b{}{}\b'.format(re.escape(first_name), re.escape(last_name))
-  singular_reversed_name = r'\b{}{}\b'.format(re.escape(last_name), re.escape(first_name))
+  name_no_space = r'\b{}{}\b'.format(re.escape(first_name), re.escape(last_name))
+  reversed_name_no_space = r'\b{}{}\b'.format(re.escape(last_name), re.escape(first_name))
 
   for transaction in transactions:
     transaction.transaction_description = re.sub(r',', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_phone_numbers, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_dates, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_url_suffixes, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(name, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(reversed_name, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(singular_name, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(singular_reversed_name, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\bcard\b|\bcrd\b', ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\.com|\.net|\.org|\.co|\.us|\.ai|\.io|\.gg|\.gov|\.edu|\.info|\.xyz|\.ly|\.site|\.me', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(name_no_space, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(reversed_name_no_space, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\*|#|-|:|\.|/', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\d', ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\s[a-z]\s', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\s[a-zA-Z]\s', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
+
+  words = []
+
+  for transaction in transactions:
+    words.extend(word_tokenize(transaction.transaction_description))
+
+  frequency_distribution = FreqDist(words)
+  less_common_words = [word for word, frequency in frequency_distribution.items() if frequency <= 2]
+  uncommon_words = r'\b(?:' + '|'.join(re.escape(word) for word in less_common_words) + r')\b'
+
+  for transaction in transactions:
+    transaction.transaction_description = re.sub(uncommon_words, '', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
 
   return transactions
