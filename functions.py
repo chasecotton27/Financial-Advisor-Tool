@@ -319,6 +319,11 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     r'\b\d{2,4}/\d{1,2}\b', r'\b\d{2,4}-\d{1,2}\b', r'\b\d{2,4}.\d{1,2}\b', r'\b\d{2,4}\s\d{1,2}\b'
   ]
 
+  symbols = [
+    r'`', r'~', r'!', r'@', r'#', r'\$', r'%', r'\^', r'\*', r'\(', r'\)', r'_', r'=', r'\+', r'\[',
+    r'\{', r'\]', r'\}', r'\\', r'\|', r';', r':', r'"', r'<', r',', r'\.', r'>', r'\?', r'/'
+  ]
+
   us_states = [
     r'\bal\b', r'\bak\b', r'\baz\b', r'\bar\b', r'\bas\b', r'\bca\b', r'\bco\b', r'\bct\b',
     r'\bde\b', r'\bdc\b', r'\bfl\b', r'\bga\b', r'\bgu\b', r'\bhi\b', r'\bid\b', r'\bil\b',
@@ -327,18 +332,25 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     r'\bnj\b', r'\bnm\b', r'\bny\b', r'\bnc\b', r'\bnd\b', r'\bmp\b', r'\boh\b', r'\bok\b',
     r'\bor\b', r'\bpa\b', r'\bpr\b', r'\bri\b', r'\bsc\b', r'\bsd\b', r'\btn\b', r'\btx\b',
     r'\btt\b', r'\but\b', r'\bvt\b', r'\bva\b', r'\bvi\b', r'\bwa\b', r'\bwv\b', r'\bwi\b',
-    r'\bwy\b', r'\bus\b', r'\busa\b'
+    r'\bwy\b'
   ]
 
   url_suffixes = [
-    r'\.com', r'\.net', r'\.org', r'\.co', r'\.us', r'\.ai', r'\.io', r'\.gg',
-    r'\.gov', r'\.edu', r'\.info', r'\.xyz', r'\.ly', r'\.site', r'\.me'
+    r'\bcom\b', r'\bnet\b', r'\borg\b', r'\bco\b', r'\bus\b', r'\bai\b', r'\bio\b', r'\bgg\b',
+    r'\bgov\b', r'\bedu\b', r'\binfo\b', r'\bxyz\b', r'\bly\b', r'\bsite\b', r'\bme\b'
+  ]
+
+  id_numbers = [
+    r'\b\d+\w+\b', r'\b\d+\w+\d+\b', r'\b\d+\w+\d+\w+\b', r'\b\d+\w+\d+\w+\d+\b', r'\b\d+\w+\d+\w+\d+\w+\b', r'\b\d+\w+\d+\w+\d+\w+\d+\b',
+    r'\b\w+\d+\b', r'\b\w+\d+\w+\b', r'\b\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\b', r'\b\w+\d+\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\d+\w+\b'
   ]
 
   combined_phone_numbers = '|'.join(['(' + phone_number + ')' for phone_number in phone_numbers])
   combined_dates = '|'.join(['(' + date + ')' for date in dates])
+  combined_symbols = '|'.join(['(' + symbol + ')' for symbol in symbols])
   combined_us_states = '|'.join(['(' + us_state + ')' for us_state in us_states])
   combined_url_suffixes = '|'.join(['(' + url_suffix + ')' for url_suffix in url_suffixes])
+  combined_id_numbers = '|'.join(['(' + id_number + ')' for id_number in id_numbers])
 
   name = r'\b{}\s{}\b'.format(re.escape(first_name), re.escape(last_name))
   reversed_name = r'\b{}\s{}\b'.format(re.escape(last_name), re.escape(first_name))
@@ -348,15 +360,16 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
   for transaction in transactions:
     transaction.transaction_description = re.sub(combined_phone_numbers, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_dates, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_symbols, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_url_suffixes, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'`|~|!|@|#|\$|%|\^|&|\*|\(|\)|_|-|=|\+|\[|\{|\]|\}|\\|\||;|:|"|\'|,|<|\.|>|/|\?', '', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(combined_id_numbers, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(name, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(reversed_name, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(name_no_space, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(reversed_name_no_space, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\d{2,}', ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\s[a-zA-Z]\s', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\d{2,}', ' ', transaction.transaction_description, count = 0) # unsure about this one
+    transaction.transaction_description = re.sub(r'\s-\s|\s-|-\s|\s&\s|\s&|&\s|\s\'\s|\s\'|\'\s', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'^\s|\s$', '', transaction.transaction_description, count = 0)
 
