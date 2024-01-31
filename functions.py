@@ -327,7 +327,7 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     r'\bnj\b', r'\bnm\b', r'\bny\b', r'\bnc\b', r'\bnd\b', r'\bmp\b', r'\boh\b', r'\bok\b',
     r'\bor\b', r'\bpa\b', r'\bpr\b', r'\bri\b', r'\bsc\b', r'\bsd\b', r'\btn\b', r'\btx\b',
     r'\btt\b', r'\but\b', r'\bvt\b', r'\bva\b', r'\bvi\b', r'\bwa\b', r'\bwv\b', r'\bwi\b',
-    r'\bwy\b'
+    r'\bwy\b', r'\bus\b', r'\busa\b'
   ]
 
   url_suffixes = [
@@ -346,31 +346,37 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
   reversed_name_no_space = r'\b{}{}\b'.format(re.escape(last_name), re.escape(first_name))
 
   for transaction in transactions:
-    transaction.transaction_description = re.sub(r',', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_phone_numbers, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_dates, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(combined_url_suffixes, ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'`|~|!|@|#|\$|%|\^|&|\*|\(|\)|_|-|=|\+|\[|\{|\]|\}|\\|\||;|:|"|\'|,|<|\.|>|/|\?', '', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(name, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(reversed_name, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(name_no_space, ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(reversed_name_no_space, ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\*|#|-|:|\.|/', ' ', transaction.transaction_description, count = 0)
-    transaction.transaction_description = re.sub(r'\d', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\d{2,}', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\s[a-zA-Z]\s', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'^\s|\s$', '', transaction.transaction_description, count = 0)
 
-  words = []
+  '''words = []
 
   for transaction in transactions:
     words.extend(word_tokenize(transaction.transaction_description))
 
-  frequency_distribution = FreqDist(words)
-  less_common_words = [word for word, frequency in frequency_distribution.items() if frequency <= 2]
-  uncommon_words = r'\b(?:' + '|'.join(re.escape(word) for word in less_common_words) + r')\b'
+  total_words = len(words)
+  frequency_threshold_percentage = 0.05
+  frequency_threshold = (frequency_threshold_percentage / 100) * total_words
 
-  for transaction in transactions:
+  frequency_distribution = FreqDist(words)
+  less_common_words = [word for word, frequency in frequency_distribution.items() if frequency <= frequency_threshold]
+  uncommon_words = r'\b(?:' + '|'.join(re.escape(word) for word in less_common_words) + r')\b'''
+
+  '''for transaction in transactions:
     transaction.transaction_description = re.sub(uncommon_words, '', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'\s[a-zA-Z]\s', ' ', transaction.transaction_description, count = 0)
     transaction.transaction_description = re.sub(r'\s+', ' ', transaction.transaction_description, count = 0)
+    transaction.transaction_description = re.sub(r'^\s|\s$', '', transaction.transaction_description, count = 0)'''
 
   return transactions
