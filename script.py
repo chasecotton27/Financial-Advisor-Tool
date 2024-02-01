@@ -76,20 +76,12 @@ transactions = checking_transactions + credit_card_transactions
 transactions = functions.format_transaction_dates(transactions)
 transactions = functions.sort_transactions(transactions)
 transactions = functions.clean_transaction_descriptions(transactions, first_name, last_name)
-transactions = functions.clean_transaction_descriptions(transactions, first_name, last_name)
 
 
 # For testing:
 
-# transactions = transactions[0]
-
 for transaction in transactions:
   print(transaction.transaction_description)
-
-'''uncommon_words = transactions[1]
-
-for uncommon_word in uncommon_words:
-  print(uncommon_word)'''
 
 '''print()
 
