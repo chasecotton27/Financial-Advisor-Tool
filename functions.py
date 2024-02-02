@@ -3,6 +3,10 @@ import csv
 import re
 from classes import Transaction
 from datetime import datetime
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 def upload_file(account_type):
@@ -342,7 +346,9 @@ def remove_id_numbers(transaction):
 
   id_numbers = [
     r'\b\d+\w+\b', r'\b\d+\w+\d+\b', r'\b\d+\w+\d+\w+\b', r'\b\d+\w+\d+\w+\d+\b', r'\b\d+\w+\d+\w+\d+\w+\b', r'\b\d+\w+\d+\w+\d+\w+\d+\b',
-    r'\b\w+\d+\b', r'\b\w+\d+\w+\b', r'\b\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\b', r'\b\w+\d+\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\d+\w+\b'
+    r'\b\d+\w+\d+\w+\d+\w+\d+\w+\b', r'\b\d+\w+\d+\w+\d+\w+\d+\w+\d+\b', r'\b\d+\w+\d+\w+\d+\w+\d+\w+\d+\w+\b',
+    r'\b\w+\d+\b', r'\b\w+\d+\w+\b', r'\b\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\b', r'\b\w+\d+\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\d+\w+\b',
+    r'\b\w+\d+\w+\d+\w+\d+\w+\d+\b', r'\b\w+\d+\w+\d+\w+\d+\w+\d+\w+\b', r'\b\w+\d+\w+\d+\w+\d+\w+\d+\w+\d+\b'
   ]
 
   combined_id_numbers = '|'.join(id_numbers)
@@ -351,7 +357,7 @@ def remove_id_numbers(transaction):
   return transaction
 
 
-def remove_us_states(transaction):
+'''def remove_us_states(transaction):
 
   us_states = [
     r'\bal\b', r'\bak\b', r'\baz\b', r'\bar\b', r'\bca\b', r'\bco\b', r'\bct\b', r'\bde\b', r'\bfl\b', r'\bga\b',
@@ -364,10 +370,10 @@ def remove_us_states(transaction):
   combined_us_states = '|'.join(us_states)
   transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
 
-  return transaction
+  return transaction'''
 
 
-def remove_misc_words(transaction):
+'''def remove_misc_words(transaction):
 
   misc_words = [
     r'\bcard\b', r'\bcrd\b', r'\bref\b'
@@ -376,7 +382,7 @@ def remove_misc_words(transaction):
   combined_misc_words = '|'.join(misc_words)
   transaction.transaction_description = re.sub(combined_misc_words, ' ', transaction.transaction_description, count = 0)
 
-  return transaction
+  return transaction'''
 
 
 def remove_symbols(transaction):
@@ -414,11 +420,11 @@ def remove_standalone_numbers(transaction):
   return transaction
 
 
-def remove_standalone_single_letters(transaction):
+'''def remove_standalone_single_letters(transaction):
 
   transaction.transaction_description = re.sub(r'(?<![\w\d&\'-])\w(?![\w\d&\'-])', ' ', transaction.transaction_description, count = 0)
 
-  return transaction
+  return transaction'''
 
 
 def remove_standalone_valuable_symbols(transaction):
@@ -445,13 +451,143 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     transaction = remove_phone_numbers(transaction)
     transaction = remove_url_components(transaction)
     transaction = remove_id_numbers(transaction)
-    transaction = remove_us_states(transaction)
-    transaction = remove_misc_words(transaction)
+    '''transaction = remove_us_states(transaction)'''
+    '''transaction = remove_misc_words(transaction)'''
     transaction = remove_symbols(transaction)
     transaction = remove_users_name(transaction, first_name, last_name)
     transaction = remove_standalone_numbers(transaction)
-    transaction = remove_standalone_single_letters(transaction)
+    '''transaction = remove_standalone_single_letters(transaction)'''
     transaction = remove_standalone_valuable_symbols(transaction)
     transaction = remove_extra_spaces(transaction)
+
+  return transactions
+
+
+def format_training_data():
+
+  csv_files_folder = 'csv_files'
+  csv_files = ['chase_2024.csv', 'chase_2023.csv', 'chase_2022.csv', 'discover_2023.csv', 'discover_2022.csv']
+  transaction_descriptions = []
+  transaction_categories = []
+
+  file_path = os.path.join('.', csv_files_folder, csv_files[0])
+
+  with open(file_path, mode = 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    row_count = 1
+    starting_row = 2
+
+    for row in csv_reader:
+      if row_count < starting_row:
+        pass
+      elif not row:
+        pass
+      else:
+        transaction_descriptions.append(row[2])
+        transaction_categories.append(row[3])
+      row_count += 1
+
+  file_path = os.path.join('.', csv_files_folder, csv_files[1])
+
+  with open(file_path, mode = 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    row_count = 1
+    starting_row = 2
+
+    for row in csv_reader:
+      if row_count < starting_row:
+        pass
+      elif not row:
+        pass
+      else:
+        transaction_descriptions.append(row[2])
+        transaction_categories.append(row[3])
+      row_count += 1
+
+  file_path = os.path.join('.', csv_files_folder, csv_files[2])
+
+  with open(file_path, mode = 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    row_count = 1
+    starting_row = 2
+
+    for row in csv_reader:
+      if row_count < starting_row:
+        pass
+      elif not row:
+        pass
+      else:
+        transaction_descriptions.append(row[2])
+        transaction_categories.append(row[3])
+      row_count += 1
+
+  file_path = os.path.join('.', csv_files_folder, csv_files[3])
+
+  with open(file_path, mode = 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    row_count = 1
+    starting_row = 2
+
+    for row in csv_reader:
+      if row_count < starting_row:
+        pass
+      elif not row:
+        pass
+      else:
+        transaction_descriptions.append(row[2])
+        transaction_categories.append(row[4])
+      row_count += 1
+
+  file_path = os.path.join('.', csv_files_folder, csv_files[4])
+
+  with open(file_path, mode = 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    row_count = 1
+    starting_row = 2
+
+    for row in csv_reader:
+      if row_count < starting_row:
+        pass
+      elif not row:
+        pass
+      else:
+        transaction_descriptions.append(row[2])
+        transaction_categories.append(row[4])
+      row_count += 1
+
+  return transaction_descriptions, transaction_categories
+
+
+def train_categories_model(transaction_descriptions, transaction_categories):
+
+  description_train, description_test, category_train, category_test = train_test_split(transaction_descriptions, transaction_categories, test_size=0.2, random_state=42)
+
+  tfidf_vectorizer = TfidfVectorizer()
+  description_train_tfidf = tfidf_vectorizer.fit_transform(description_train)
+  description_test_tfidf = tfidf_vectorizer.transform(description_test)
+
+  classifier = MultinomialNB()
+  classifier.fit(description_train_tfidf, category_train)
+
+  y_pred = classifier.predict(description_test_tfidf)
+  accuracy = accuracy_score(category_test, y_pred)
+
+  return tfidf_vectorizer, classifier, accuracy
+
+
+def predict_categories(transactions, tfidf_vectorizer, classifier):
+
+  for transaction in transactions:
+    if transaction.transaction_category == 'none':
+      transaction_vector = tfidf_vectorizer.transform([transaction.transaction_description])
+      predicted_category = classifier.predict(transaction_vector)
+      transaction.transaction_category = predicted_category[0]
+    else:
+      pass
 
   return transactions

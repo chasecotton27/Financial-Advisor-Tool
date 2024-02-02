@@ -78,60 +78,30 @@ transactions = functions.sort_transactions(transactions)
 transactions = functions.clean_transaction_descriptions(transactions, first_name, last_name)
 
 
+# For machine learning:
+
+training_data = functions.format_training_data()
+transaction_descriptions = training_data[0]
+transaction_categories = training_data[1]
+
+categories_model = functions.train_categories_model(transaction_descriptions, transaction_categories)
+tfidf_vectorizer = categories_model[0]
+classifier = categories_model[1]
+model_accuracy = categories_model[2]
+
+transactions = functions.predict_categories(transactions, tfidf_vectorizer, classifier)
+
+
 # For testing:
 
 for transaction in transactions:
-  print(transaction.transaction_description)
-
-'''print()
-
-for checking_account_transactions in checking_accounts_transactions:
-  for i in range(3):
-    print('First 3 Transactions (from checking_accounts_transactions):')
-    print()
-    print(f'Account Type: {checking_account_transactions[i].account_type}')
-    print(f'Transaction Date: {checking_account_transactions[i].transaction_date}')
-    print(f'Transaction Description: {checking_account_transactions[i].transaction_description}')
-    print(f'Transaction Amount: {checking_account_transactions[i].transaction_amount}')
-    print(f'Transaction Category: {checking_account_transactions[i].transaction_category}')
-    print(f'Transaction Type: {checking_account_transactions[i].transaction_type}')
-    print()
-
-for credit_card_account_transactions in credit_card_accounts_transactions:
-  for i in range(3):
-    print('First 3 Transactions (from credit_card_accounts_transactions):')
-    print()
-    print(f'Account Type: {credit_card_account_transactions[i].account_type}')
-    print(f'Transaction Date: {credit_card_account_transactions[i].transaction_date}')
-    print(f'Transaction Description: {credit_card_account_transactions[i].transaction_description}')
-    print(f'Transaction Amount: {credit_card_account_transactions[i].transaction_amount}')
-    print(f'Transaction Category: {credit_card_account_transactions[i].transaction_category}')
-    print(f'Transaction Type: {credit_card_account_transactions[i].transaction_type}')
-    print()
-
-print('First 5 Transactions (from transactions):')
-print()
-
-for i in range(5):
-  print(f'Account Type: {transactions[i].account_type}')
-  print(f'Transaction Date: {transactions[i].transaction_date}')
-  print(f'Transaction Description: {transactions[i].transaction_description}')
-  print(f'Transaction Amount: {transactions[i].transaction_amount}')
-  print(f'Transaction Category: {transactions[i].transaction_category}')
-  print(f'Transaction Type: {transactions[i].transaction_type}')
   print()
+  print(f'Description: {transaction.transaction_description}')
+  print(f'Category: {transaction.transaction_category}')
 
-print('Last 5 Transactions (from transactions):')
 print()
-
-for i in range(-1, -6, -1):
-  print(f'Account Type: {transactions[i].account_type}')
-  print(f'Transaction Date: {transactions[i].transaction_date}')
-  print(f'Transaction Description: {transactions[i].transaction_description}')
-  print(f'Transaction Amount: {transactions[i].transaction_amount}')
-  print(f'Transaction Category: {transactions[i].transaction_category}')
-  print(f'Transaction Type: {transactions[i].transaction_type}')
-  print()'''
+print(f'Model Accuracy: {(model_accuracy*100): .2f}%')
+print()
 
 
 # From Chase and Discover formats:
