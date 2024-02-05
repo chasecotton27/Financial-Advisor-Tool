@@ -92,6 +92,10 @@ model_accuracy = categories_model[2]
 transactions = functions.predict_categories(transactions, tfidf_vectorizer, classifier)
 
 
+# NEED TO CLEAN TRAINING FILE DESCRIPTIONS BEFORE TRAINING THE CATEGORIES MODEL
+# ALSO NEED TO COMPARE THE ACCURACY OF CLEANED DESCRIPTIONS AGAINST NON-CLEANED
+
+
 # For testing:
 
 for transaction in transactions:
@@ -104,35 +108,36 @@ print(f'Model Accuracy: {(model_accuracy*100): .2f}%')
 print()
 
 
-# From Chase and Discover formats:
+# Category Options:
 
-'''Category Options:
+# automotive
+# bills
+# credits
+# education
+# entertainment
+# fees
+# food/drinks
+# gas/snacks
+# groceries
+# health
+# income
+# investments
+# miscellaneous
+# payments
+# pets
+# rent/mortgage
+# services
+# shopping
+# transfers
+# travel
 
-automotive
-awards & credits
-education
-entertainment
-fees & adjustments
-gas stations
-gifts & donations
-groceries
-health & wellness
-home improvement
-miscellaneous
-payments
-rent & mortgage
-restaurants
-services
-shopping
-travel
-utilities
 
-Type Options:
+# Type Options:
 
-fee
-payment
-return
-sale'''
+# fee
+# payment
+# return
+# sale
 
 
 # The goal is to adjust the transaction attributes for each transaction so that they follow a uniform structure

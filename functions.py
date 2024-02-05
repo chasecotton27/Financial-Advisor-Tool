@@ -427,100 +427,35 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
 
 def format_training_data():
 
-  csv_files_folder = 'csv_files'
-  csv_files = ['chase_2024.csv', 'chase_2023.csv', 'chase_2022.csv', 'discover_2023.csv', 'discover_2022.csv']
   transaction_descriptions = []
   transaction_categories = []
 
-  file_path = os.path.join('.', csv_files_folder, csv_files[0])
+  training_files_folder = 'training_files'
+  folder_path = os.path.join(os.path.dirname(__file__), training_files_folder)
 
-  with open(file_path, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
+  if os.path.exists(folder_path) and os.path.isdir(folder_path):
+    files = os.listdir(folder_path)
 
-    row_count = 1
-    starting_row = 2
+    for file in files:
+      file_path = os.path.join(folder_path, file)
 
-    for row in csv_reader:
-      if row_count < starting_row:
-        pass
-      elif not row:
-        pass
-      else:
-        transaction_descriptions.append(row[2])
-        transaction_categories.append(row[3])
-      row_count += 1
+      with open(file_path, mode = 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
 
-  file_path = os.path.join('.', csv_files_folder, csv_files[1])
+        row_count = 1
+        starting_row = 2
 
-  with open(file_path, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    row_count = 1
-    starting_row = 2
-
-    for row in csv_reader:
-      if row_count < starting_row:
-        pass
-      elif not row:
-        pass
-      else:
-        transaction_descriptions.append(row[2])
-        transaction_categories.append(row[3])
-      row_count += 1
-
-  file_path = os.path.join('.', csv_files_folder, csv_files[2])
-
-  with open(file_path, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    row_count = 1
-    starting_row = 2
-
-    for row in csv_reader:
-      if row_count < starting_row:
-        pass
-      elif not row:
-        pass
-      else:
-        transaction_descriptions.append(row[2])
-        transaction_categories.append(row[3])
-      row_count += 1
-
-  file_path = os.path.join('.', csv_files_folder, csv_files[3])
-
-  with open(file_path, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    row_count = 1
-    starting_row = 2
-
-    for row in csv_reader:
-      if row_count < starting_row:
-        pass
-      elif not row:
-        pass
-      else:
-        transaction_descriptions.append(row[2])
-        transaction_categories.append(row[4])
-      row_count += 1
-
-  file_path = os.path.join('.', csv_files_folder, csv_files[4])
-
-  with open(file_path, mode = 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    row_count = 1
-    starting_row = 2
-
-    for row in csv_reader:
-      if row_count < starting_row:
-        pass
-      elif not row:
-        pass
-      else:
-        transaction_descriptions.append(row[2])
-        transaction_categories.append(row[4])
-      row_count += 1
+        for row in csv_reader:
+          if row_count < starting_row:
+            pass
+          elif not row:
+            pass
+          else:
+            transaction_descriptions.append(row[0])
+            transaction_categories.append(row[1])
+          row_count += 1
+  else:
+    print('Error: The training_files folder does not exist.')
 
   return transaction_descriptions, transaction_categories
 
@@ -544,12 +479,17 @@ def train_categories_model(transaction_descriptions, transaction_categories):
 
 def predict_categories(transactions, tfidf_vectorizer, classifier):
 
-  for transaction in transactions:
+  '''for transaction in transactions:
     if transaction.transaction_category == 'none':
       transaction_vector = tfidf_vectorizer.transform([transaction.transaction_description])
       predicted_category = classifier.predict(transaction_vector)
       transaction.transaction_category = predicted_category[0]
     else:
-      pass
+      pass'''
+
+  for transaction in transactions:
+    transaction_vector = tfidf_vectorizer.transform([transaction.transaction_description])
+    predicted_category = classifier.predict(transaction_vector)
+    transaction.transaction_category = predicted_category[0]
 
   return transactions
