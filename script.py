@@ -108,38 +108,31 @@ print()
 
 '''Category Options:
 
-services
-merchandise
-travel
-gifts & donations
-education
-home improvement
-food & drink
-gasoline
-fees & adjustments
-groceries
-travel/ entertainment
 automotive
-gas
-professional services
-department stores
-payments and credits
-personal
-none
-supermarkets
-shopping
-restaurants
-health & wellness
-awards and rebate credits
+awards & credits
+education
 entertainment
+fees & adjustments
+gas stations
+gifts & donations
+groceries
+health & wellness
+home improvement
+miscellaneous
+payments
+rent & mortgage
+restaurants
+services
+shopping
+travel
+utilities
 
 Type Options:
 
-none
-sale
+fee
 payment
 return
-fee'''
+sale'''
 
 
 # The goal is to adjust the transaction attributes for each transaction so that they follow a uniform structure

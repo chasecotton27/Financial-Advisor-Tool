@@ -357,34 +357,6 @@ def remove_id_numbers(transaction):
   return transaction
 
 
-'''def remove_us_states(transaction):
-
-  us_states = [
-    r'\bal\b', r'\bak\b', r'\baz\b', r'\bar\b', r'\bca\b', r'\bco\b', r'\bct\b', r'\bde\b', r'\bfl\b', r'\bga\b',
-    r'\bhi\b', r'\bid\b', r'\bil\b', r'\bin\b', r'\bia\b', r'\bks\b', r'\bky\b', r'\bla\b', r'\bme\b', r'\bmd\b',
-    r'\bma\b', r'\bmi\b', r'\bmn\b', r'\bms\b', r'\bmo\b', r'\bmt\b', r'\bne\b', r'\bnv\b', r'\bnh\b', r'\bnj\b',
-    r'\bnm\b', r'\bny\b', r'\bnc\b', r'\bnd\b', r'\boh\b', r'\bok\b', r'\bor\b', r'\bpa\b', r'\bri\b', r'\bsc\b',
-    r'\bsd\b', r'\btn\b', r'\btx\b', r'\but\b', r'\bvt\b', r'\bva\b', r'\bwa\b', r'\bwv\b', r'\bwi\b', r'\bwy\b'
-  ]
-
-  combined_us_states = '|'.join(us_states)
-  transaction.transaction_description = re.sub(combined_us_states, ' ', transaction.transaction_description, count = 0)
-
-  return transaction'''
-
-
-'''def remove_misc_words(transaction):
-
-  misc_words = [
-    r'\bcard\b', r'\bcrd\b', r'\bref\b'
-  ]
-
-  combined_misc_words = '|'.join(misc_words)
-  transaction.transaction_description = re.sub(combined_misc_words, ' ', transaction.transaction_description, count = 0)
-
-  return transaction'''
-
-
 def remove_symbols(transaction):
 
   symbols = [
@@ -420,13 +392,6 @@ def remove_standalone_numbers(transaction):
   return transaction
 
 
-'''def remove_standalone_single_letters(transaction):
-
-  transaction.transaction_description = re.sub(r'(?<![\w\d&\'-])\w(?![\w\d&\'-])', ' ', transaction.transaction_description, count = 0)
-
-  return transaction'''
-
-
 def remove_standalone_valuable_symbols(transaction):
 
   transaction.transaction_description = re.sub(r'(?<![\w\d&\'-])&+(?![\w\d&\'-])', ' ', transaction.transaction_description, count = 0)
@@ -451,12 +416,9 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
     transaction = remove_phone_numbers(transaction)
     transaction = remove_url_components(transaction)
     transaction = remove_id_numbers(transaction)
-    '''transaction = remove_us_states(transaction)'''
-    '''transaction = remove_misc_words(transaction)'''
     transaction = remove_symbols(transaction)
     transaction = remove_users_name(transaction, first_name, last_name)
     transaction = remove_standalone_numbers(transaction)
-    '''transaction = remove_standalone_single_letters(transaction)'''
     transaction = remove_standalone_valuable_symbols(transaction)
     transaction = remove_extra_spaces(transaction)
 
