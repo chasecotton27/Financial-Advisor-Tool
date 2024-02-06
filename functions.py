@@ -425,8 +425,9 @@ def clean_transaction_descriptions(transactions, first_name, last_name):
   return transactions
 
 
-def format_training_data():
+def format_training_data(first_name, last_name):
 
+  transactions = []
   transaction_descriptions = []
   transaction_categories = []
 
@@ -451,11 +452,20 @@ def format_training_data():
           elif not row:
             pass
           else:
-            transaction_descriptions.append(row[0])
-            transaction_categories.append(row[1])
+            transaction_description = row[0].lower()
+            transaction_category = row[1].lower()
+            transaction = Transaction('none', 'none', transaction_description, 'none', transaction_category, 'none')
+            transactions.append(transaction)
           row_count += 1
+
   else:
     print('Error: The training_files folder does not exist.')
+
+  transactions = clean_transaction_descriptions(transactions, first_name, last_name)
+
+  for transaction in transactions:
+    transaction_descriptions.append(transaction.transaction_description)
+    transaction_categories.append(transaction.transaction_category)
 
   return transaction_descriptions, transaction_categories
 
@@ -479,17 +489,12 @@ def train_categories_model(transaction_descriptions, transaction_categories):
 
 def predict_categories(transactions, tfidf_vectorizer, classifier):
 
-  '''for transaction in transactions:
+  for transaction in transactions:
     if transaction.transaction_category == 'none':
       transaction_vector = tfidf_vectorizer.transform([transaction.transaction_description])
       predicted_category = classifier.predict(transaction_vector)
       transaction.transaction_category = predicted_category[0]
     else:
-      pass'''
-
-  for transaction in transactions:
-    transaction_vector = tfidf_vectorizer.transform([transaction.transaction_description])
-    predicted_category = classifier.predict(transaction_vector)
-    transaction.transaction_category = predicted_category[0]
+      pass
 
   return transactions

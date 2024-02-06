@@ -80,7 +80,7 @@ transactions = functions.clean_transaction_descriptions(transactions, first_name
 
 # For machine learning:
 
-training_data = functions.format_training_data()
+training_data = functions.format_training_data(first_name, last_name)
 transaction_descriptions = training_data[0]
 transaction_categories = training_data[1]
 
@@ -90,10 +90,6 @@ classifier = categories_model[1]
 model_accuracy = categories_model[2]
 
 transactions = functions.predict_categories(transactions, tfidf_vectorizer, classifier)
-
-
-# NEED TO CLEAN TRAINING FILE DESCRIPTIONS BEFORE TRAINING THE CATEGORIES MODEL
-# ALSO NEED TO COMPARE THE ACCURACY OF CLEANED DESCRIPTIONS AGAINST NON-CLEANED
 
 
 # For testing:
@@ -138,12 +134,3 @@ print()
 # payment
 # return
 # sale
-
-
-# The goal is to adjust the transaction attributes for each transaction so that they follow a uniform structure
-# These attributes should be the main determinator of the classification/operation of a transaction
-# Then, account/transaction records can be created to analyze the transactions as a whole
-# Keep the functions very modular, where each function completes a very specific task
-# AccountRecord might need to be changed to TransactionRecord, depending on the requirements that become visible later
-# Assigning and updating transaction attributes might involve some machine learning, that way there's no dependency on keywords specific to my account
-# These attributes can be updated one step at a time, since a complete transactions list already exists
